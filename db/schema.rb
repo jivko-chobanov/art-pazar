@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130104213240) do
+ActiveRecord::Schema.define(:version => 20130105204622) do
 
   create_table "product_specifications", :force => true do |t|
     t.integer  "type_id",                 :null => false
@@ -36,42 +36,48 @@ ActiveRecord::Schema.define(:version => 20130104213240) do
     t.boolean  "boolean_3"
     t.boolean  "boolean_4"
     t.boolean  "boolean_5"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "product_types", :force => true do |t|
-    t.string "tinyint_1",  :limit => 70, :default => "", :null => false
-    t.string "smallint_1", :limit => 70, :default => "", :null => false
-    t.string "smallint_2", :limit => 70, :default => "", :null => false
-    t.string "int_1",      :limit => 70, :default => "", :null => false
-    t.string "string_1",   :limit => 70, :default => "", :null => false
-    t.string "string_2",   :limit => 70, :default => "", :null => false
-    t.string "string_3",   :limit => 70, :default => "", :null => false
-    t.string "string_4",   :limit => 70, :default => "", :null => false
-    t.string "string_5",   :limit => 70, :default => "", :null => false
-    t.string "string_6",   :limit => 70, :default => "", :null => false
-    t.string "string_7",   :limit => 70, :default => "", :null => false
-    t.string "string_8",   :limit => 70, :default => "", :null => false
-    t.string "string_9",   :limit => 70, :default => "", :null => false
-    t.string "float_1",    :limit => 70, :default => "", :null => false
-    t.string "datetime_1", :limit => 70, :default => "", :null => false
-    t.string "datetime_2", :limit => 70, :default => "", :null => false
-    t.string "boolean_1",  :limit => 70, :default => "", :null => false
-    t.string "boolean_2",  :limit => 70, :default => "", :null => false
-    t.string "boolean_3",  :limit => 70, :default => "", :null => false
-    t.string "boolean_4",  :limit => 70, :default => "", :null => false
+    t.string   "tinyint_1",  :limit => 70, :default => "", :null => false
+    t.string   "smallint_1", :limit => 70, :default => "", :null => false
+    t.string   "smallint_2", :limit => 70, :default => "", :null => false
+    t.string   "int_1",      :limit => 70, :default => "", :null => false
+    t.string   "string_1",   :limit => 70, :default => "", :null => false
+    t.string   "string_2",   :limit => 70, :default => "", :null => false
+    t.string   "string_3",   :limit => 70, :default => "", :null => false
+    t.string   "string_4",   :limit => 70, :default => "", :null => false
+    t.string   "string_5",   :limit => 70, :default => "", :null => false
+    t.string   "string_6",   :limit => 70, :default => "", :null => false
+    t.string   "string_7",   :limit => 70, :default => "", :null => false
+    t.string   "string_8",   :limit => 70, :default => "", :null => false
+    t.string   "string_9",   :limit => 70, :default => "", :null => false
+    t.string   "float_1",    :limit => 70, :default => "", :null => false
+    t.string   "datetime_1", :limit => 70, :default => "", :null => false
+    t.string   "datetime_2", :limit => 70, :default => "", :null => false
+    t.string   "boolean_1",  :limit => 70, :default => "", :null => false
+    t.string   "boolean_2",  :limit => 70, :default => "", :null => false
+    t.string   "boolean_3",  :limit => 70, :default => "", :null => false
+    t.string   "boolean_4",  :limit => 70, :default => "", :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "products", :force => true do |t|
-    t.string  "name",                                              :null => false
-    t.float   "price",                                             :null => false
-    t.integer "category",          :limit => 2,                    :null => false
-    t.boolean "published",                      :default => false, :null => false
-    t.boolean "sold",                           :default => false, :null => false
-    t.integer "width",             :limit => 2,                    :null => false
-    t.integer "height",            :limit => 2,                    :null => false
-    t.integer "depth",             :limit => 2,                    :null => false
-    t.string  "short_description",              :default => "",    :null => false
-    t.text    "info",                           :default => "",    :null => false
+    t.string   "name",                                              :null => false
+    t.float    "price",                                             :null => false
+    t.integer  "category",          :limit => 2,                    :null => false
+    t.boolean  "published",                      :default => false, :null => false
+    t.boolean  "sold",                           :default => false, :null => false
+    t.integer  "width",             :limit => 2,                    :null => false
+    t.integer  "height",            :limit => 2,                    :null => false
+    t.integer  "depth",             :limit => 2,                    :null => false
+    t.string   "short_description",              :default => "",    :null => false
+    t.text     "info",                           :default => "",    :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end
