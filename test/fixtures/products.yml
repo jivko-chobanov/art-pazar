@@ -1,0 +1,7 @@
+valid_product:
+  name: Празник
+  price: 0.50
+  category_id: 123
+  width: 100
+  height: 50
+  depth: 0

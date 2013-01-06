@@ -11,5 +11,6 @@ class ProductTypeTest < ActiveSupport::TestCase
     product_type = ProductType.new
 
     assert_not_nil defined?(product_type.products), 'product_type has many products'
+    assert_not_nil defined?(product_type.product_specifications), 'product_type has many product_specifications'
   end
 end

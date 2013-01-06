@@ -11,13 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130105204622) do
+ActiveRecord::Schema.define(:version => 20130106002336) do
 
   create_table "product_specifications", :force => true do |t|
-    t.integer  "type_id",                 :null => false
-    t.integer  "tinyint_1",  :limit => 2
-    t.integer  "smallint_1", :limit => 2
-    t.integer  "smallint_2", :limit => 2
+    t.integer  "tinyint_1",       :limit => 2
+    t.integer  "smallint_1",      :limit => 2
+    t.integer  "smallint_2",      :limit => 2
     t.integer  "int_1"
     t.string   "string_1"
     t.string   "string_2"
@@ -38,6 +37,8 @@ ActiveRecord::Schema.define(:version => 20130105204622) do
     t.boolean  "boolean_5"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "product_type_id"
+    t.integer  "product_id"
   end
 
   create_table "product_types", :force => true do |t|
@@ -68,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20130105204622) do
   create_table "products", :force => true do |t|
     t.string   "name",                                              :null => false
     t.float    "price",                                             :null => false
-    t.integer  "category",          :limit => 2,                    :null => false
+    t.integer  "category_id",       :limit => 2,                    :null => false
     t.boolean  "published",                      :default => false, :null => false
     t.boolean  "sold",                           :default => false, :null => false
     t.integer  "width",             :limit => 2,                    :null => false
@@ -78,6 +79,7 @@ ActiveRecord::Schema.define(:version => 20130105204622) do
     t.text     "info",                           :default => "",    :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "product_type_id"
   end
 
 end

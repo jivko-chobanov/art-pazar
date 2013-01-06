@@ -11,5 +11,6 @@ class ProductSpecificationTest < ActiveSupport::TestCase
     product_specification = ProductSpecification.new
 
     assert_not_nil defined?(product_specification.product), 'product_specification belongs to product'
+    assert_not_nil defined?(product_specification.product_type), 'product_specification belongs to product_type'
   end
 end
