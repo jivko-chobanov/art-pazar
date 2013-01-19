@@ -5,3 +5,4 @@ valid_product:
   width: 100
   height: 50
   depth: 0
+  product_type: valid_type

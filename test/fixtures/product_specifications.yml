@@ -1,0 +1,4 @@
+valid_specification:
+  product: valid_product
+  product_type: valid_type
+  tinyint_1: 57
