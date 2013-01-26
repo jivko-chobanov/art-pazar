@@ -24,6 +24,9 @@ end
 group :development, :test do
   gem 'rspec-rails'
   gem 'rspec'
+  gem 'guard'
+  gem 'guard-rspec'
+  gem 'guard-bundler'
 end
 
 gem 'jquery-rails'
