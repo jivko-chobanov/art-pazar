@@ -1,4 +1,4 @@
-require(__FILE__.split('/art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
 class Home
   attr_reader :loaded_data
@@ -9,7 +9,7 @@ class Home
 
   def load
     @loaded_data[:products] = Pipe.get(:data,
-      data_obj_name: :product,
+      data_obj_class: Main::Product,
       attribute_group: :list,
       order: :last,
       limit: 10

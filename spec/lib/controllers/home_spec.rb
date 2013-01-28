@@ -10,6 +10,7 @@ describe Home do
     
     expect(home.loaded_data).to have_key :products
     expect(home.ready_for_html?).to be_true
-    expect(home.html).not_to be_nil and be_empty
+    expect(home.html).not_to be_nil
+    expect(home.html).not_to be_empty
   end
 end
