@@ -1,4 +1,5 @@
 require_relative 'pipe'
 require_relative 'support'
-require_relative 'attribute_group'
+require_relative 'attribute_groups'
+require_relative 'loaded_data'
 require_relative 'data_objects/product'

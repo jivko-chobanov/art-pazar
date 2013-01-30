@@ -1,34 +1,33 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
 class Home
-  attr_reader :loaded_data
-  
+  attr_reader :tried_to_load
+
   def initialize
-    @loaded_data = {}
+    @products = Main::Products.new
+    @tried_to_load = false
   end
 
   def load
-    @loaded_data[:products] = Pipe.get(:data,
-      data_obj_class: Main::Product,
-      attribute_group: :list,
-      order: :last,
-      limit: 10
-    )
-  end
-
-  def html
-    if ready_for_html?
-      Pipe.get :html, data: @loaded_data
+    unless @tried_to_load
+      @tried_to_load = true
+      @products.get(
+        attribute_group: :list,
+        order: :last,
+        limit: 10
+      )
     else
-      raise "load before getting html"
+      raise "cannot load home twice"
     end
   end
 
-  def ready_for_html?
-    if @loaded_data.empty?
-      false
+  def html
+    if @products.initialized_only?
+      raise "Home page cannot generate HTML without data to be loaded first."
+    elsif @products.loaded_empty_result?
+      Pipe.get :txt, txt: :no_products_for_home_page
     else
-      true
+      @products.html
     end
   end
 end

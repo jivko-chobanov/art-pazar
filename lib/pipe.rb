@@ -11,10 +11,17 @@ class Pipe
       @needs_and_input = needs_and_input
       
       case what
-        when :data
+        when :loaded_data_obj
           get_data
         when :html
           get_html
+        when :txt
+          case @needs_and_input[:txt]
+            when :no_products_for_home_page
+              "There are no products yet. Comming soon."
+            else
+              raise "text message for #{@needs_and_input[:txt]} not written"
+          end
         else
           raise "cannot understand what is wanted by #{what.to_s}"
       end
@@ -31,54 +38,23 @@ class Pipe
       end
     end
 
+    def data_exists
+      @needs_and_input.include? :loaded_data_obj and not( @needs_and_input[:loaded_data_obj].empty? )
+    end
+
     def fake_html
-      html = "HTML for #{@needs_and_input[:data].keys.join ", "}\n\n"
+      if data_exists
+        html = "HTML for #{@needs_and_input[:loaded_data_obj].types.join ", "}\n\n"
 
-      @needs_and_input[:data].each do |data_obj_name, items|
-        html << data_obj_name.to_s << ":\n"
-        html << as_table_string(items)
-      end
-      html
-    end
-
-    def as_table_string(ordered_rows_with_cells_described)
-      ordered_rows_with_cells_described = column_names_to_head_row ordered_rows_with_cells_described
-      ordered_rows = without_cells_description ordered_rows_with_cells_described
-
-      rows_of_values_to_table ordered_rows
-    end
-
-    def without_cells_description(rows_with_cells_by_column_name)
-      rows_with_cells_by_column_name.map { |cells_by_column_name| Hash[cells_by_column_name].values }
-    end
-
-    def rows_of_values_to_table(rows_of_values)
-      table_string = rows_of_values.inject("") do |table, cells|
-        column_id = 0
-        row_str = cells.inject("") do |row, value|
-          row << value.to_s.ljust(2 + max_length_of_column(column_id, rows_of_values))
-          column_id = column_id + 1
-          row
+        @needs_and_input[:loaded_data_obj].each do |data_obj_name, items|
+          html << data_obj_name.to_s << ":\n"
+          html << Support::as_table_string(items)
         end
-        table << row_str.strip << "\n"
+      else
+        html = "HTML for empty data"
       end
-      table_string
-    end
 
-    def max_length_of_column(column_id, rows_of_values)
-      max_length = 0
-      rows_of_values.each do |row|
-        max_length = row[column_id].to_s.length if row[column_id].to_s.length > max_length
-      end
-      max_length
-    end
-
-    def column_names_to_head_row(rows_by_ordering_index_where_row_is_hash_of_column_name_and_cell_value)
-      rows = rows_by_ordering_index_where_row_is_hash_of_column_name_and_cell_value
-      column_names = Hash[rows.first].keys
-
-      rows.unshift column_names.zip(column_names)
-      rows
+      html
     end
 
     def get_data
@@ -99,7 +75,7 @@ class Pipe
         end
 
         case @needs_and_input[:data_obj_class].name
-          when Main::Product.name
+          when Main::Products.name
             @needs_and_input[:limit].times do |index|
               fake_data << fake_item(index)
             end
@@ -128,7 +104,7 @@ class Pipe
         product_type_id: 100 + i
       }.select do |name, value|
         @needs_and_input[:data_obj_class]
-          .get_attributes(@needs_and_input[:attribute_group])
+          .attributes_of(@needs_and_input[:attribute_group])
           .include? name
       end
     end
@@ -140,8 +116,8 @@ class Pipe
             raise MissingNeedOrInputError, "limit should be included into needs_and_input"
           end
         when :get_html
-          unless @needs_and_input.include? :data
-            raise MissingNeedOrInputError, "cannot make html without :data"
+          unless @needs_and_input.include? :loaded_data_obj
+            raise MissingNeedOrInputError, "cannot make html without :loaded_data_obj"
           end
         else
           raise "undefined method #{for_method} in #{__method__}'s case"

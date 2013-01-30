@@ -1,4 +1,4 @@
-interactor :off
+#interactor :off
 
 group :backend do
   guard :bundler do
