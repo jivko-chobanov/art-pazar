@@ -1,4 +1,4 @@
-require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+#require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
 class Home
   attr_reader :tried_to_load
@@ -11,7 +11,7 @@ class Home
   def load
     unless @tried_to_load
       @tried_to_load = true
-      @products.get(
+      @products.load(
         attribute_group: :list,
         order: :last,
         limit: 10

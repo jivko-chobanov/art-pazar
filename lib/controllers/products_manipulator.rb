@@ -1,9 +1,5 @@
 class ProductsManipulator
-  def initialize(phase, action)
-    @phase, @action = phase, action
-  end
-
-  def html
-    "Fill in fields: name, category_id, price"
+  def input_fields_html
+    Main::Products.new.input_fields_html
   end
 end

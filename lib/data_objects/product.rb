@@ -11,7 +11,7 @@ module Main
       @tried_to_load = false
     end
 
-    def get(needs)
+    def load(needs)
       @tried_to_load = true
       needs[:data_obj_class] = Main::Products
       @loaded_data.put :products, Pipe.get(:loaded_data_obj, needs)
@@ -23,6 +23,10 @@ module Main
       else
         Pipe.get :html, loaded_data_obj: @loaded_data
       end
+    end
+
+    def input_fields_html
+      "Fill in fields: #{Main::Products.attributes_of(:fields_for_put_or_update).join ", "}"
     end
 
     def initialized_only?
