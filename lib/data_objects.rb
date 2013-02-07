@@ -14,7 +14,7 @@ class DataObjects
     @loaded_data.put data_obj_name, @pipe.get(:loaded_data_obj_content, needs)
   end
 
-  def loaded_data
+  def loaded_data_hash
     if_loaded_then do
       @loaded_data.to_hash
     end

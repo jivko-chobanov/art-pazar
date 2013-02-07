@@ -25,12 +25,16 @@ end
 describe ProductShowPage do
   context "in integration:" do
     it "gets product page html"do
-      expect(ProductShowPage.new.load_and_get_html).to eq "HTML for Products
+      expect(ProductShowPage.new(:paintings).load_and_get_html).to eq(
+"HTML for Products, ProductSpecifications
 
 Products:
 NAME            PRICE  HEIGHT
 name value (0)  5.43   12
-"
+ProductSpecifications:
+SMALLINT_1  STRING_1    STRING_2    STRING_3
+0           value1 (0)  value2 (0)  value3 (0)
+")
     end
   end
 end

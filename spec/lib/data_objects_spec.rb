@@ -44,13 +44,13 @@ describe DataObjects do
   end
 
   it "gives loaded data as hash" do
-    expect { data_objects.loaded_data }.to raise_error RuntimeError
+    expect { data_objects.loaded_data_hash }.to raise_error RuntimeError
 
     load_with_args data_objects, {attribute_group: :list, limit: 2},
       {attributes: [:name, :price], data_obj_name: "DataObjects", limit: 2}
 
     loaded_data.stub(:to_hash).and_return "content got by pipe to hash"
-    expect(data_objects.loaded_data).to eq "content got by pipe to hash"
+    expect(data_objects.loaded_data_hash).to eq "content got by pipe to hash"
   end
 
   it "gives information about data" do

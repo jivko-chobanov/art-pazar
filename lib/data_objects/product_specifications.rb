@@ -5,7 +5,8 @@ module Main
         @data = {
           paintings: {
             attribute_groups_definitions_using_instance_names: {
-              list: [:artist, :year]
+              list: [:artist, :year],
+              for_visitor: [:artist, :year, :paint, :frames],
             },
             attribute_names_by_instance_attribute_name: {
               year: :smallint_1,

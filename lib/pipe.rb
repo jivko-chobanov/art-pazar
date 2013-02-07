@@ -156,20 +156,61 @@ class Pipe
   def fake_data
       fake_data = []
 
-      case @needs_and_input[:data_obj_name]
+      fake_item_method = case @needs_and_input[:data_obj_name]
         when "Products"
-          @needs_and_input[:limit].times do |index|
-            fake_data << fake_item(index)
-          end
+          ->(index) { fake_product index }
+        when "ProductSpecifications"
+          ->(index) { fake_product_specifications index }
         else
           raise "does not know how to make fake data for #{@needs_and_input[:data_obj_name]}"
+      end
+
+      @needs_and_input[:limit].times do |index|
+        fake_data << fake_item_method.(index)
       end
 
     fake_data
   end
 
-  def fake_item(i)
-    {
+  def get_wated_attributes(fake_item)
+    fake_item.select do |name, value|
+      @needs_and_input[:attributes].include? name
+    end
+  end
+    
+  def fake_product_specifications(i)
+    get_wated_attributes({
+      id: i + @needs_and_input[:offset],
+      tinyint_1: i,
+      smallint_1: i,
+      smallint_2: i,
+      int_1: i,
+      string_1: "value1 (#{i})",
+      string_2: "value2 (#{i})",
+      string_3: "value3 (#{i})",
+      string_4: "value4 (#{i})",
+      string_5: "value5 (#{i})",
+      string_6: "value6 (#{i})",
+      string_7: "value7 (#{i})",
+      string_8: "value8 (#{i})",
+      string_9: "value9 (#{i})",
+      float_1: i + 0.5,
+      datetime_1: "datetime1 (#{i})",
+      datetime_2: "datetime1 (#{i})",
+      boolean_1: true,
+      boolean_2: false,
+      boolean_3: true,
+      boolean_4: false,
+      boolean_5: true,
+      created_at: "created at",
+      updated_at: "updated at",
+      product_type_id: i + 100,
+      product_id: i + 1000,
+    })
+  end
+
+  def fake_product(i)
+    get_wated_attributes({
       id: i + @needs_and_input[:offset],
       name: "name value (#{i})",
       price: 5.43 + i,
@@ -184,9 +225,7 @@ class Pipe
       created_at: "created_at value (#{i})",
       updated_at: "updated_at value (#{i})",
       product_type_id: 100 + i
-    }.select do |name, value|
-      @needs_and_input[:attributes].include? name
-    end
+    })
   end
 
   def check_needs_and_input(for_method)
