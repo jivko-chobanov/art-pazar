@@ -1,18 +1,16 @@
-class ProductShow
-  include ShowPage
-
+class ProductUpdatePage < UpdateOrCreatePage
   def initialize
     @product = Main::Products.new
   end
 
   def load
-    load_show_page do
-      @product.load attribute_group: :for_visitor, limit: 1 
+    super do
+      @product.load attribute_group: :for_update, limit: 1 
     end
   end
 
   def html
-    html_of_show_page(pipe_name_of_txt_if_empty_content) { @product.html }
+    super { @product.html_for_update }
   end
 
   def pipe_name_of_txt_if_empty_content

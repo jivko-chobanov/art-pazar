@@ -48,27 +48,90 @@ describe Pipe do
       expect(pipe.get :txt, txt: :no_products_for_home_page).not_to be_empty
     end
 
-    it "generates fake html" do
-      Support.stub(:as_table_string)
-        .with("product items for #as_table_string") { "products table string\n" }
-      Support.stub(:as_table_string)
-        .with("qqq items for #as_table_string") { "qqq table string\n" }
+    context "when fake html is wanted" do
+      context "when data is ok" do
+        it "generates data object visualization" do
+          Support.stub(:as_table_string)
+            .with("product items for #as_table_string") { "products table string\n" }
+          Support.stub(:as_table_string)
+            .with("qqq items for #as_table_string") { "qqq table string\n" }
 
-      html = pipe.get :html, {
-        data_by_type: {
-          "Products" => "product items for #as_table_string",
-          "Qqq"      => "qqq items for #as_table_string"
-        }
-      }
+          html = pipe.get :html, {
+            data_by_type: {
+              "Products" => "product items for #as_table_string",
+              "Qqq"      => "qqq items for #as_table_string"
+            }
+          }
 
-      expected_html =
-        "HTML for Products, Qqq\n\n" <<
-        "Products:\n" <<
-        "products table string\n" <<
-        "Qqq:\n" <<
-        "qqq table string\n"
+          expected_html =
+            "HTML for Products, Qqq\n\n" <<
+            "Products:\n" <<
+            "products table string\n" <<
+            "Qqq:\n" <<
+            "qqq table string\n"
 
-      expect(html).to eq expected_html
+          expect(html).to eq expected_html
+        end
+
+        it "generates update fields" do
+          html = pipe.get :html_for_update, {
+            data_by_type: {
+              "Products" => [{name: "old name", category_id: 1, price: 2}],
+            }
+          }
+
+          expect(html).to eq(
+            "HTML for updating Products fields: name " <<
+            "was \"old name\", category_id was \"1\", price was \"2\""
+          )
+        end
+
+        it "generates create fields" do
+          html = pipe.get :html_for_create, {
+            data_by_type: {
+              "Products" => [[:name, :category_id, :price]]
+            }
+          }
+
+          expect(html).to eq(
+            "HTML for creating Products with fields: name, category_id, price"
+          )
+        end
+      end
+
+      context "when data is empty" do
+        it "generates html" do
+          html = pipe.get :html, {
+            data_by_type: {}
+          }
+
+          expect(html).to eq "HTML for empty data"
+        end
+
+        it "raises error for create fields" do
+          expect { pipe.get :html_for_create, { data_by_type: {} } }.to raise_error RuntimeError
+          expect {
+            pipe.get :html_for_create, {
+              data_by_type: {
+                "Type1" => "any1",
+                "Type2" => "any2"
+              }
+            }
+          }.to raise_error RuntimeError
+        end
+
+        it "raises error for update fields" do
+          expect { pipe.get :html_for_update, { data_by_type: {} } }.to raise_error RuntimeError
+          expect {
+            pipe.get :html_for_update, {
+              data_by_type: {
+                "Type1" => "any1",
+                "Type2" => "any2"
+              }
+            }
+          }.to raise_error RuntimeError
+        end
+      end
     end
   end
 end

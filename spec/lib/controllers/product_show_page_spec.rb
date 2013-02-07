@@ -1,24 +1,28 @@
-module ShowPage
+class ShowPage
+  def load
+    yield if block_given?
+  end
+
+  def html
+    yield if block_given?
+  end
 end
 
 require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
 
-describe ProductShow do
+describe ProductShowPage do
   let(:product) { double }
-  subject(:product_show) do
-    ProductShow.send(:define_method, :initialize_show_page) {}
-    ProductShow.new
+  subject(:product_show_page) do
+    ProductShowPage.new
   end
 
   def load_prepare_fakes
-    product_show.stub(:load_show_page).and_yield
     product.stub(:load)
       .with attribute_group: :for_visitor, limit: 1 
   end
 
   def html_prepare_fakes
-    product_show.stub(:html_of_show_page).and_return "HTML for product page"
-    product.stub(:loaded_empty_result?).and_return false
+    product.stub(:html).and_return "HTML for product page"
   end
 
   before do
@@ -30,18 +34,20 @@ describe ProductShow do
 
   it "loads product and makes html in two steps" do
     load_prepare_fakes
-    product_show.load
+    product_show_page.load
 
     html_prepare_fakes
-    expect(product_show.html).to eq "HTML for product page"
+    expect(product_show_page.html).to eq "HTML for product page"
   end
 
   it "displays msg if no product to load" do
     load_prepare_fakes
-    product_show.load
+    product_show_page.load
 
     product.stub(:loaded_empty_result?).with(no_args).and_return true
-    product_show.stub(:html_of_show_page).with(:no_product).and_return "No product."
-    expect(product_show.html).to eq "No product."
+    expect(product_show_page.pipe_name_of_txt_if_empty_content).to eq :no_product
+
+    product_show_page.stub(:html).and_return "No product."
+    expect(product_show_page.html).to eq "No product."
   end
 end

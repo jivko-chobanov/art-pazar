@@ -1,13 +1,13 @@
 class DataObjects
   def initialize(child_class)
     @loaded_data = LoadedData.new
-    @tried_to_load = false
+    @is_loaded = false
     @pipe = Pipe.new
     @child_class = child_class
   end
 
   def load(needs)
-    @tried_to_load = true
+    @is_loaded = true
     needs[:data_obj_name] = data_obj_name
     needs[:attributes] = attributes_of needs[:attribute_group]
     needs.delete :attribute_group
@@ -15,11 +15,19 @@ class DataObjects
   end
 
   def html
-    if initialized_only?
-      raise "Cannot generate HTML without data to be loaded first."
-    else
+    if_loaded_then do
       @pipe.get :html, data_by_type: @loaded_data.to_hash
     end
+  end
+
+  def html_for_update
+    if_loaded_then do
+      @pipe.get :html_for_update, data_by_type: @loaded_data.to_hash
+    end
+  end
+
+  def html_for_create
+    @pipe.get :html_for_create, data_by_type: {data_obj_name => [attributes_of(:for_create)]}
   end
 
   def input_fields_html
@@ -27,7 +35,7 @@ class DataObjects
   end
 
   def initialized_only?
-    not( @tried_to_load )
+    not( @is_loaded )
   end
 
   def loaded_empty_result?
@@ -67,5 +75,13 @@ class DataObjects
 
   def put(attributes)
     @pipe.put data_obj_name, attributes
+  end
+
+  def if_loaded_then
+    if initialized_only?
+      raise "Cannot generate HTML without data to be loaded first."
+    else
+      yield
+    end
   end
 end

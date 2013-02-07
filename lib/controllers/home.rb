@@ -1,13 +1,12 @@
-class Home
-  include ShowPage
+class Home < ShowPage
 
   def initialize
     @products = Main::Products.new
-    initialize_show_page
+    super
   end
 
   def load
-    load_show_page do
+    super do
       @products.load(
         attribute_group: :list,
         order: :last,
@@ -17,7 +16,7 @@ class Home
   end
 
   def html
-    html_of_show_page(pipe_name_of_txt_if_empty_content) { @products.html }
+    super { @products.html }
   end
 
   def pipe_name_of_txt_if_empty_content

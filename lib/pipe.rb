@@ -48,6 +48,10 @@ class Pipe
         get_data
       when :html
         get_html
+      when :html_for_update
+        get_html_for_update
+      when :html_for_create
+        get_html_for_create
       when :txt
         case @needs_and_input[:txt]
           when :no_products_for_home_page
@@ -71,12 +75,56 @@ class Pipe
     end
   end
 
+  def get_html_for_create
+    check_needs_and_input __method__
+
+    if defined? Rails
+    else
+      fake_html_for_create
+    end
+  end
+
+  def get_html_for_update
+    check_needs_and_input __method__
+
+    if defined? Rails
+    else
+      fake_html_for_update
+    end
+  end
+
   def get_html
     check_needs_and_input __method__
 
     if defined? Rails
     else
       fake_html
+    end
+  end
+
+  def fake_html_for_create
+    if @needs_and_input[:data_by_type].empty?
+      raise "Data for fields is empty"
+    elsif @needs_and_input[:data_by_type].size > 1
+      raise "Cannot load fields for more than one object"
+    else
+      "HTML for creating #{@needs_and_input[:data_by_type].keys.first} with fields: #{
+        @needs_and_input[:data_by_type].first[1].first.join ", "
+      }"
+    end
+  end
+
+  def fake_html_for_update
+    if @needs_and_input[:data_by_type].empty?
+      raise "Loaded data is empty"
+    elsif @needs_and_input[:data_by_type].size > 1
+      raise "Cannot load fields for more than one object"
+    else
+      "HTML for updating #{@needs_and_input[:data_by_type].keys.first} fields: #{
+        @needs_and_input[:data_by_type].first[1].first.map do |system_name_of_field, old_value|
+          "#{system_name_of_field} was \"#{old_value}\""
+        end.join ", "
+      }"
     end
   end
 
@@ -147,7 +195,7 @@ class Pipe
         unless @needs_and_input.include? :limit
           raise MissingNeedOrInputError, "limit should be included into needs_and_input"
         end
-      when :get_html
+      when :get_html, :get_html_for_update, :get_html_for_create
         unless @needs_and_input.include? :data_by_type
           raise MissingNeedOrInputError, "cannot make html without :data_by_type"
         end

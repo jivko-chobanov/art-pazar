@@ -1,0 +1,2 @@
+class UpdateOrCreatePage < Page
+end
