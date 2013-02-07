@@ -14,6 +14,12 @@ class DataObjects
     @loaded_data.put data_obj_name, @pipe.get(:loaded_data_obj_content, needs)
   end
 
+  def loaded_data
+    if_loaded_then do
+      @loaded_data.to_hash
+    end
+  end
+
   def html
     if_loaded_then do
       @pipe.get :html, data_by_type: @loaded_data.to_hash
