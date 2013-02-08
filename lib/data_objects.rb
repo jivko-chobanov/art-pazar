@@ -40,15 +40,15 @@ class DataObjects
     "Fill in fields: #{attributes_of(:fields_for_create_or_update).join ", "}"
   end
 
-  def initialized_only?
-    not( @is_loaded )
+  def loaded?
+    @is_loaded
   end
 
   def loaded_empty_result?
-    if initialized_only?
-      raise "Not tried to load yet."
-    else
+    if loaded?
       @loaded_data.empty?
+    else
+      raise "Not tried to load yet."
     end
   end
 
@@ -84,10 +84,10 @@ class DataObjects
   end
 
   def if_loaded_then
-    if initialized_only?
-      raise "Cannot generate HTML without data to be loaded first."
-    else
+    if loaded?
       yield
+    else
+      raise "Cannot generate HTML without data to be loaded first."
     end
   end
 end

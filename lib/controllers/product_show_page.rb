@@ -1,13 +1,14 @@
 class ProductShowPage < ShowPage
-  def initialize(product_type)
+  def initialize
     @product = Main::Products.new
-    @product_specifications = Main::ProductSpecifications.new product_type
+    @product_specifications = Main::ProductSpecifications.new
     @pipe = Pipe.new
   end
 
   def load
     super do
       @product.load attribute_group: :for_visitor, limit: 1 
+      @product_specifications.type = @product.type
       @product_specifications.load attribute_group: :for_visitor, limit: 1 
     end
   end

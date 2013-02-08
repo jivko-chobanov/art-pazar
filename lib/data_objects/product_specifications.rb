@@ -49,16 +49,34 @@ module Main
       end
     end
 
-    def initialize(product_type)
+    def type=(product_type)
       @type = Type.new product_type
-
       @attribute_groups = AttributeGroups.new @type.attribute_groups_definitions
+    end
 
+    def initialize
       super self.class
     end
 
     def specification_names
-      @type.instance_attribute_names
+      if type_set?
+        @type.instance_attribute_names
+      end
+    end
+
+    def attributes_of attribute_group
+      if type_set?
+        super attribute_group
+      end
+    end
+
+    private
+
+    def type_set?
+      if @type.nil?
+        raise "Set #type= first"
+      end
+      true
     end
   end
 end

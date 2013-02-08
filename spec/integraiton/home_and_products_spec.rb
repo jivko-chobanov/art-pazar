@@ -25,7 +25,7 @@ end
 describe ProductShowPage do
   context "in integration:" do
     it "gets product page html"do
-      expect(ProductShowPage.new(:paintings).load_and_get_html).to eq(
+      expect(ProductShowPage.new.load_and_get_html).to eq(
 "HTML for Products, ProductSpecifications
 
 Products:

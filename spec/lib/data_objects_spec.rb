@@ -58,13 +58,13 @@ describe DataObjects do
 
     empty_data_objects = new_data_objects
     expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError
-    expect(empty_data_objects.initialized_only?).to be_true
+    expect(empty_data_objects.loaded?).to be_false
 
     load_with_args empty_data_objects, {attribute_group: :list, limit: 0},
       {attributes: [:name, :price], data_obj_name: "DataObjects", limit: 0}
 
     loaded_data.stub(:empty?).and_return true
-    expect(empty_data_objects.initialized_only?).to be_false
+    expect(empty_data_objects.loaded?).to be_true
     expect(empty_data_objects.loaded_empty_result?).to be_true
 
     not_empty_data_objects = new_data_objects

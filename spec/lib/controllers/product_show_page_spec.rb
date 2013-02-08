@@ -15,14 +15,16 @@ describe ProductShowPage do
   let(:product_specifications) { double }
   let(:pipe) { double }
   subject(:product_show_page) do
-    ProductShowPage.new :paintings
+    ProductShowPage.new
   end
 
-  def load_prepare_fakes
+  def load_prepare_fakes(type)
     product.stub(:load)
       .with attribute_group: :for_visitor, limit: 1 
     product_specifications.stub(:load)
       .with attribute_group: :for_visitor, limit: 1 
+    product.should_receive(:type).and_return :paintings
+    product_specifications.should_receive(:type=).with type
   end
 
   def html_prepare_fakes
@@ -41,12 +43,12 @@ describe ProductShowPage do
     stub_const "Pipe", Class.new
 
     Main::Products.stub(:new).and_return product
-    Main::ProductSpecifications.stub(:new).with(:paintings).and_return product_specifications
+    Main::ProductSpecifications.stub(:new).and_return product_specifications
     Pipe.stub(:new) { pipe }
   end
 
   it "loads product and makes html in two steps" do
-    load_prepare_fakes
+    load_prepare_fakes :paintings
     product_show_page.load
 
     html_prepare_fakes
@@ -54,7 +56,7 @@ describe ProductShowPage do
   end
 
   it "displays msg if no product to load" do
-    load_prepare_fakes
+    load_prepare_fakes :paintings
     product_show_page.load
 
     product.stub(:loaded_empty_result?).with(no_args).and_return true
