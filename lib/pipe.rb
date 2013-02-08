@@ -103,29 +103,37 @@ class Pipe
   end
 
   def fake_html_for_create
+    html = ""
     if @needs_and_input[:data_by_type].empty?
       raise "Data for fields is empty"
-    elsif @needs_and_input[:data_by_type].size > 1
-      raise "Cannot load fields for more than one object"
     else
-      "HTML for creating #{@needs_and_input[:data_by_type].keys.first} with fields: #{
-        @needs_and_input[:data_by_type].first[1].first.join ", "
-      }"
+      html = "HTML for creating #{@needs_and_input[:data_by_type].keys.join ", "} with fields:\n\n"
+
+      @needs_and_input[:data_by_type].each do |data_obj_name, item_of_system_names_of_fields|
+        html << data_obj_name.to_s << ":\n"
+        html << item_of_system_names_of_fields.first.join(", ") << "\n"
+      end
     end
+    html
   end
 
   def fake_html_for_update
+    html = ""
     if @needs_and_input[:data_by_type].empty?
       raise "Loaded data is empty"
-    elsif @needs_and_input[:data_by_type].size > 1
-      raise "Cannot load fields for more than one object"
     else
-      "HTML for updating #{@needs_and_input[:data_by_type].keys.first} fields: #{
-        @needs_and_input[:data_by_type].first[1].first.map do |system_name_of_field, old_value|
-          "#{system_name_of_field} was \"#{old_value}\""
-        end.join ", "
-      }"
+      html = "HTML for updating #{@needs_and_input[:data_by_type].keys.join ", "} fields:\n\n"
+
+      @needs_and_input[:data_by_type].each do |data_obj_name, items|
+        html << data_obj_name.to_s << ":\n"
+        items.each do |item|
+          html << item.map do |system_name, old_value|
+            "#{system_name} was \"#{old_value}\""
+          end.join(", ") << "\n"
+        end
+      end
     end
+    html
   end
 
   def fake_html

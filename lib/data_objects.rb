@@ -32,8 +32,12 @@ class DataObjects
     end
   end
 
+  def loaded_data_hash_for_create
+    {data_obj_name => [attributes_of(:for_create)]}
+  end
+
   def html_for_create
-    @pipe.get :html_for_create, data_by_type: {data_obj_name => [attributes_of(:for_create)]}
+    @pipe.get :html_for_create, data_by_type: loaded_data_hash_for_create
   end
 
   def input_fields_html

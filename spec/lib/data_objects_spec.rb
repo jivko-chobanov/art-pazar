@@ -37,10 +37,16 @@ describe DataObjects do
 
   it "gives attributes of attribute groups" do
     data_object_attribute_groups.stub(:attributes_of).with(:list).and_return [:name, :price]
-    expect(data_objects.attributes_of :list).not_to be_empty
+    expect(data_objects.attributes_of :list).to eq [:name, :price]
 
-    data_object_attribute_groups.stub(:attributes_of).with(:qqq)
-    expect(data_objects.attributes_of :qqq).to raise_error
+    data_object_attribute_groups.stub(:attributes_of).with(:for_create)
+      .and_return "attributes for create"
+    expect(data_objects.loaded_data_hash_for_create).to eq(
+      "DataObjects" => ["attributes for create"]
+    )
+
+    data_object_attribute_groups.stub(:attributes_of).with(:qqq).and_raise RuntimeError
+    expect { data_objects.attributes_of :qqq }.to raise_error RuntimeError
   end
 
   it "gives loaded data as hash" do

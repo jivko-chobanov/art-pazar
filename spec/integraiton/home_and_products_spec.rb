@@ -42,7 +42,14 @@ end
 describe ProductUpdatePage do
   context "in integration:" do
     it "gets product update page html" do
-      expect(ProductUpdatePage.new.load_and_get_html).to eq "HTML for updating Products fields: name was \"name value (0)\", price was \"5.43\", category_id was \"12\""
+      expect(ProductUpdatePage.new.load_and_get_html).to eq(
+"HTML for updating Products, ProductSpecifications fields:
+
+Products:
+name was \"name value (0)\", price was \"5.43\", category_id was \"12\"
+ProductSpecifications:
+name was \"name value (0)\", price was \"5.43\", category_id was \"12\"
+")
     end
   end
 end
@@ -50,7 +57,14 @@ end
 describe ProductCreatePage do
   context "in integration:" do
     it "gets product create page html" do
-      expect(ProductCreatePage.new.load_and_get_html).to eq "HTML for creating Products with fields: name, category_id, price"
+      expect(ProductCreatePage.new.load_and_get_html :paintings).to eq(
+"HTML for creating Products, ProductSpecifications with fields:
+
+Products:
+name, category_id, price
+ProductSpecifications:
+string_1, smallint_1, string_2, string_3
+")
     end
   end
 end

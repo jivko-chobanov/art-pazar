@@ -1,7 +1,4 @@
 class Page
-  attr_reader :is_loaded
-  alias loaded? is_loaded
-
   def initialize
     @is_loaded = false
   end
@@ -28,5 +25,9 @@ class Page
   def load_and_get_html
     load
     html
+  end
+
+  def loaded?
+    @is_loaded
   end
 end

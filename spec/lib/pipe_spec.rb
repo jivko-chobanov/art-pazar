@@ -77,24 +77,33 @@ describe Pipe do
           html = pipe.get :html_for_update, {
             data_by_type: {
               "Products" => [{name: "old name", category_id: 1, price: 2}],
+              "Other" => [{name: "old name2", other_attr: 5, price: 2}],
             }
           }
 
           expect(html).to eq(
-            "HTML for updating Products fields: name " <<
-            "was \"old name\", category_id was \"1\", price was \"2\""
+            "HTML for updating Products, Other fields:\n\n" <<
+            "Products:\n" <<
+            "name was \"old name\", category_id was \"1\", price was \"2\"\n" <<
+            "Other:\n" <<
+            "name was \"old name2\", other_attr was \"5\", price was \"2\"\n"
           )
         end
 
         it "generates create fields" do
           html = pipe.get :html_for_create, {
             data_by_type: {
-              "Products" => [[:name, :category_id, :price]]
+              "Products" => [[:name, :category_id, :price]],
+              "Other" => [[:name, :other_attr, :price]],
             }
           }
 
           expect(html).to eq(
-            "HTML for creating Products with fields: name, category_id, price"
+            "HTML for creating Products, Other with fields:\n\n" <<
+            "Products:\n" <<
+            "name, category_id, price\n" <<
+            "Other:\n" <<
+            "name, other_attr, price\n"
           )
         end
       end
@@ -110,26 +119,10 @@ describe Pipe do
 
         it "raises error for create fields" do
           expect { pipe.get :html_for_create, { data_by_type: {} } }.to raise_error RuntimeError
-          expect {
-            pipe.get :html_for_create, {
-              data_by_type: {
-                "Type1" => "any1",
-                "Type2" => "any2"
-              }
-            }
-          }.to raise_error RuntimeError
         end
 
         it "raises error for update fields" do
           expect { pipe.get :html_for_update, { data_by_type: {} } }.to raise_error RuntimeError
-          expect {
-            pipe.get :html_for_update, {
-              data_by_type: {
-                "Type1" => "any1",
-                "Type2" => "any2"
-              }
-            }
-          }.to raise_error RuntimeError
         end
       end
     end
