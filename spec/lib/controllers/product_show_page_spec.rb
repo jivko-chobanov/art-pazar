@@ -24,7 +24,7 @@ describe ProductShowPage do
     product_specifications.stub(:load)
       .with attribute_group: :for_visitor, limit: 1 
     product.should_receive(:type).and_return :paintings
-    product_specifications.should_receive(:type=).with type
+    product_specifications.should_receive(:type=).with :paintings
   end
 
   def html_prepare_fakes

@@ -32,6 +32,10 @@ class DataObjects
     end
   end
 
+  def loaded_data_hash_for_update
+    loaded_data_hash
+  end
+
   def loaded_data_hash_for_create
     {data_obj_name => [attributes_of(:for_create)]}
   end

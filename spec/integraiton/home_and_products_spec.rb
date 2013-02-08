@@ -48,7 +48,7 @@ describe ProductUpdatePage do
 Products:
 name was \"name value (0)\", price was \"5.43\", category_id was \"12\"
 ProductSpecifications:
-name was \"name value (0)\", price was \"5.43\", category_id was \"12\"
+smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"value2 (0)\", string_3 was \"value3 (0)\"
 ")
     end
   end
