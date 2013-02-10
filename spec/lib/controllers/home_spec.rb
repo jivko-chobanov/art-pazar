@@ -1,18 +1,7 @@
-class ShowPage
-  def load
-    yield if block_given?
-  end
-
-  def html
-    yield if block_given?
-  end
-end
-
-require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-
-describe Home do
+describe "Home" do
   let(:products) { double }
   subject(:home) do
+    require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     Home.new
   end
 
@@ -26,10 +15,13 @@ describe Home do
   end
 
   before do
+    stub_const "ShowPage", Class.new
     stub_const "Main", Module.new
     stub_const "Main::Products", Class.new
 
     Main::Products.stub(:new).and_return products
+    ShowPage.send(:define_method, :load) { |&block| block.call }
+    ShowPage.send(:define_method, :html) { |&block| block.call }
   end
 
   it "loads products and makes html in two steps" do

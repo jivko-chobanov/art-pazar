@@ -35,6 +35,11 @@ class Page
     end
   end
 
+  def load_and_accomplish(&to_accomplish)
+    load
+    accomplish &to_accomplish
+  end
+
   def loaded?
     @is_loaded
   end

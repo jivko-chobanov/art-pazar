@@ -1,24 +1,9 @@
-class UpdateOrCreatePage
-  def load
-    yield if block_given?
-  end
-
-  def html
-    yield if block_given?
-  end
-
-  def accomplish
-    yield if block_given?
-  end
-end
-
-require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-
-describe ProductCreatePage do
+describe "ProductCreatePage" do
   let(:product) { double }
   let(:product_specifications) { double }
   let(:pipe) { double }
   subject(:product_create_page) do
+    require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     ProductCreatePage.new
   end
 
@@ -49,6 +34,7 @@ describe ProductCreatePage do
   end
 
   before do
+    stub_const "UpdateOrCreatePage", Class.new
     stub_const "Main", Module.new
     stub_const "Main::Products", Class.new
     stub_const "Main::ProductSpecifications", Class.new
@@ -57,6 +43,9 @@ describe ProductCreatePage do
     Main::Products.stub(:new).and_return product
     Main::ProductSpecifications.stub(:new).and_return product_specifications
     Pipe.stub(:new) { pipe }
+    UpdateOrCreatePage.send(:define_method, :load) { |&block| block.call }
+    UpdateOrCreatePage.send(:define_method, :html) { |&block| block.call }
+    UpdateOrCreatePage.send(:define_method, :accomplish) { |&block| block.call }
   end
 
   it "gets pipe" do
@@ -93,7 +82,7 @@ describe ProductCreatePage do
     it "in one step" do
       load_prepare_fakes :paintings
       accomplish_prepare_fakes
-      expect(product_create_page.load_and_do :paintings).to be_true
+      expect(product_create_page.load_and_accomplish :paintings).to be_true
     end
   end
 end

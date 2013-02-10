@@ -1,12 +1,18 @@
-require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+describe "LoadedData" do
+  subject(:loaded_data) do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+    LoadedData.new
+  end
 
-describe LoadedData do
+  before :all do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+  end
+
   before do
     stub_const "Support", Class.new
   end
 
   it "stores and gets" do
-    loaded_data = LoadedData.new
     loaded_data.put "Products", "the data"
     loaded_data.put "Other", "other data"
     
@@ -20,8 +26,6 @@ describe LoadedData do
   end
 
   it "gets information about data" do
-    loaded_data = LoadedData.new
-
     Support.stub(:empty?).with({}).and_return true
     expect(loaded_data.empty?).to be_true
     

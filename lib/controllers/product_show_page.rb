@@ -5,11 +5,15 @@ class ProductShowPage < ShowPage
     @pipe = Pipe.new
   end
 
-  def load
-    super do
-      @product.load attribute_group: :for_visitor, limit: 1 
-      @product_specifications.type = @product.type
-      @product_specifications.load attribute_group: :for_visitor, limit: 1 
+  def load(id)
+    super() do
+      @product.load_from_db id: id, attribute_group: :for_visitor, limit: 1 
+      @product_specifications.load_from_db(
+        id: id,
+        type: @product.type,
+        attribute_group: :for_visitor,
+        limit: 1 
+      )
     end
   end
 

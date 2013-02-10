@@ -6,12 +6,14 @@ class DataObjects
     @child_class = child_class
   end
 
-  def load(needs)
-    @is_loaded = true
-    needs[:data_obj_name] = data_obj_name
-    needs[:attributes] = attributes_of needs[:attribute_group]
-    needs.delete :attribute_group
-    @loaded_data.put data_obj_name, @pipe.get(:loaded_data_obj_content, needs)
+  def load_from_params(needs)
+    needs[:pipe_gets_what] = :params
+    load_from_pipe needs
+  end
+
+  def load_from_db(needs)
+    needs[:pipe_gets_what] = :loaded_data_obj_content
+    load_from_pipe needs
   end
 
   def loaded_data_hash
@@ -74,6 +76,10 @@ class DataObjects
   end
 
   def update(attributes)
+    unless attributes.include? :id
+      raise "Cannot update without an id"
+    end
+
     put attributes
   end
 
@@ -92,6 +98,26 @@ class DataObjects
       yield
     else
       raise "Cannot generate HTML without data to be loaded first."
+    end
+  end
+
+  def load_from_pipe(needs)
+    check_needs(needs)
+
+    @is_loaded = true
+
+    pipe_gets_what = needs[:pipe_gets_what]
+    needs.delete :pipe_gets_what
+
+    needs[:attributes] = attributes_of needs[:attribute_group]
+    needs.delete :attribute_group
+
+    @loaded_data.put data_obj_name, @pipe.get(pipe_gets_what, needs)
+  end
+
+  def check_needs(needs)
+    unless needs.include? :attribute_group
+      raise "Load must have in its needs :attribute_group"
     end
   end
 end

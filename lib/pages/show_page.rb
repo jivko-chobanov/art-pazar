@@ -1,5 +1,5 @@
 class ShowPage < Page
-  def do
+  def accomplish
     raise "Cannot exec a show page"
   end
 end

@@ -1,10 +1,11 @@
-require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
-
-describe DataObjects do
+describe "DataObjects" do
   let(:data_object_attribute_groups) { double put: nil }
   let(:loaded_data) { double }
   let(:pipe) { double }
-  subject(:data_objects) { new_data_objects }
+  subject(:data_objects) do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+    new_data_objects
+  end
 
   def new_data_objects
     data_objects = DataObjects.new(Products)
@@ -15,17 +16,20 @@ describe DataObjects do
     data_objects
   end
 
-  def load_with_args(data_objects, args_for_load, expected_second_arg_for_pipe)
-    pipe.should_receive(:get)
-      .with(:loaded_data_obj_content, expected_second_arg_for_pipe)
+  def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
+    pipe.should_receive(:get).with(*expected_args_for_pipe)
       .and_return "content got by pipe"
     data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
-      .and_return expected_second_arg_for_pipe[:attributes]
+      .and_return expected_args_for_pipe[1][:attributes]
     loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
-    data_objects.load args_for_load
+    data_objects.send load_method, args_for_load
   end
 
-  before :each do
+  before :all do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+  end
+
+  before do
     stub_const "AttributeGroups", Class.new
     stub_const "LoadedData", Class.new
     stub_const "Pipe", Class.new
@@ -61,8 +65,8 @@ describe DataObjects do
   it "gives loaded data as hash" do
     expect { data_objects.loaded_data_hash }.to raise_error RuntimeError
 
-    load_with_args data_objects, {attribute_group: :list, limit: 2},
-      {attributes: [:name, :price], data_obj_name: "DataObjects", limit: 2}
+    load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 2},
+      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 2}]
 
     loaded_data.stub(:to_hash).and_return "content got by pipe to hash"
     expect(data_objects.loaded_data_hash).to eq "content got by pipe to hash"
@@ -75,18 +79,41 @@ describe DataObjects do
     expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError
     expect(empty_data_objects.loaded?).to be_false
 
-    load_with_args empty_data_objects, {attribute_group: :list, limit: 0},
-      {attributes: [:name, :price], data_obj_name: "DataObjects", limit: 0}
+    load_with_args :load_from_db, empty_data_objects, {attribute_group: :list, limit: 0},
+      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 0}]
 
     loaded_data.stub(:empty?).and_return true
     expect(empty_data_objects.loaded?).to be_true
     expect(empty_data_objects.loaded_empty_result?).to be_true
 
     not_empty_data_objects = new_data_objects
-    load_with_args not_empty_data_objects, {attribute_group: :list, limit: 1},
-      {attributes: [:name, :price], data_obj_name: "DataObjects", limit: 1}
+    load_with_args :load_from_db, not_empty_data_objects, {attribute_group: :list, limit: 1},
+      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 1}]
     loaded_data.stub(:empty?).and_return false
     expect(not_empty_data_objects.loaded_empty_result?).to be_false
+  end
+  
+  context "when loading" do
+    it "from params" do
+      load_with_args :load_from_params, data_objects,
+        {attribute_group: :for_create, suffix: "_ok"},
+        [:params, {attributes: [:name, :price], suffix: "_ok"}]
+    end
+
+    it "from database" do
+      load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 1},
+        [:loaded_data_obj_content, {attributes: [:name, :price], limit: 1}]
+    end
+
+    context "raises errors" do
+      it "from database" do
+        expect { data_objects.load_from_db limit: 1 }.to raise_error RuntimeError
+      end
+
+      it "from params" do
+        expect { data_objects.load_from_params suffix: "_ok" }.to raise_error RuntimeError
+      end
+    end
   end
 
   it "creates" do
@@ -105,6 +132,9 @@ describe DataObjects do
   end
 
   it "updates" do
+    attributes = {name: "new name", price: 3.10}
+    expect { new_data_objects.update attributes }.to raise_error RuntimeError
+
     attributes = {id: 12, name: "new name", price: 3.10}
     pipe.should_receive(:put).with("DataObjects", attributes).and_return true
     expect(data_objects.update attributes).to be_true
@@ -119,11 +149,11 @@ describe DataObjects do
         .with(:list, {}).and_return "attributes of group list"
       pipe.should_receive(:get).with(
         :loaded_data_obj_content,
-        {:limit => 5, :data_obj_name => "DataObjects", :attributes => "attributes of group list"}
+        {:limit => 5, :attributes => "attributes of group list"}
       ).and_return "content got by pipe"
       loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
 
-      data_objects.load attribute_group: :list, limit: 5
+      data_objects.load_from_db attribute_group: :list, limit: 5
 
       loaded_data.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html, data_by_type: "loaded data to hash")
@@ -133,8 +163,8 @@ describe DataObjects do
     end
     
     it "presents update interface" do
-      load_with_args data_objects, {attribute_group: :for_update, limit: 1},
-        {attributes: [:name, :category_id, :price], data_obj_name: "DataObjects", limit: 1}
+      load_with_args :load_from_db, data_objects, {attribute_group: :for_update, limit: 1},
+        [:loaded_data_obj_content, {attributes: [:name, :category_id, :price], limit: 1}]
 
       loaded_data.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html_for_update, data_by_type: "loaded data to hash")

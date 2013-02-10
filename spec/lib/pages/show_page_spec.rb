@@ -1,16 +1,14 @@
-class Page
-end
-
-require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-
-describe ShowPage do
-  subject(:any_show_page) { AnyShowPage.new }
+describe "ShowPage" do
+  subject(:show_page) do
+    require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
+    ShowPage.new
+  end
 
   before do
-    stub_const "AnyShowPage", Class.new(ShowPage)
+    stub_const "Page", Class.new
   end
 
   it "raises error on execution" do
-    expect { any_show_page.do }.to raise_error RuntimeError
+    expect { show_page.accomplish }.to raise_error RuntimeError
   end
 end

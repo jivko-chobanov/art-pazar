@@ -1,6 +1,8 @@
-require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+describe "Support" do
+  before :all do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+  end
 
-describe Support do
   it "transforms ordered array of hashes with keys = column names to string which looks like table in the console with labeled columns on the top" do
     html = Support.as_table_string([
       {name: "My name", price: 5.43},

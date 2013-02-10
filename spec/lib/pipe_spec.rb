@@ -1,7 +1,12 @@
-require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+describe "Pipe" do
+  let(:pipe) do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+    Pipe.new
+  end
 
-describe Pipe do
-  let(:pipe) { Pipe.new }
+  before :all do
+    require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
+  end
 
   before :each do
     stub_const "Support", Class.new

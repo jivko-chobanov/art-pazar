@@ -38,7 +38,7 @@ class ProductCreatePage < UpdateOrCreatePage
     end
   end
 
-  def load_and_do(product_type)
+  def load_and_accomplish(product_type)
     load product_type
     accomplish
   end

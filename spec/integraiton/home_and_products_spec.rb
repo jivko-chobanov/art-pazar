@@ -1,9 +1,12 @@
-require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+describe "Home" do
+  subject(:home) do
+    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+    Home.new
+  end
 
-describe Home do
   context "in integration:" do
     it "makes html for products" do
-      expect(Home.new.load_and_get_html).to eq "HTML for Products
+      expect(home.load_and_get_html).to eq "HTML for Products
 
 Products:
 NAME            PRICE
@@ -22,10 +25,15 @@ name value (9)  14.43
   end
 end
 
-describe ProductShowPage do
+describe "ProductShowPage" do
+  subject(:product_show_page) do
+    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+    ProductShowPage.new
+  end
+
   context "in integration:" do
     it "gets product page html"do
-      expect(ProductShowPage.new.load_and_get_html).to eq(
+      expect(product_show_page.load_and_get_html).to eq(
 "HTML for Products, ProductSpecifications
 
 Products:
@@ -39,12 +47,15 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
   end
 end
 
-describe ProductUpdatePage do
-  subject(:product_update_page) { ProductUpdatePage.new }
+describe "ProductUpdatePage" do
+  subject(:product_update_page) do
+    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+    ProductUpdatePage.new
+  end
 
   context "in integration:" do
     it "gets product update page html" do
-      expect(product_update_page.load_and_get_html).to eq(
+      expect(product_update_page.load_and_get_html 123).to eq(
 "HTML for updating Products, ProductSpecifications fields:
 
 Products:
@@ -55,12 +66,25 @@ smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"value2 (0)\", 
     end
 
     it "updates product and product specification" do
+      expect(product_update_page.load_and_accomplish 123).to eq true
+      expect(product_update_page.pipe.logs).to eq(
+        ["Got params: name_p, category_id_p, price_p",
+        "Products updates name to name param val, category_id to category_id param val, " <<
+          "price to price param val.",
+        "Got params: string_1_ps, smallint_1_ps, string_2_ps, string_3_ps",
+        "ProductSpecifications updates string_1 to string_1 param val, " <<
+          "smallint_1 to smallint_1 param val, string_2 to string_2 param val, " <<
+          "string_3 to string_3 param val."]
+      )
     end
   end
 end
 
-describe ProductCreatePage do
-  subject(:product_create_page) { ProductCreatePage.new }
+describe "ProductCreatePage" do
+  subject(:product_create_page) do
+    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+    ProductCreatePage.new
+  end
 
   context "in integration:" do
     it "gets product create page html" do
@@ -75,7 +99,7 @@ string_1, smallint_1, string_2, string_3
     end
 
     it "creates product and product specification" do
-      expect(product_create_page.load_and_do :paintings).to eq true
+      expect(product_create_page.load_and_accomplish :paintings).to eq true
       expect(product_create_page.pipe.logs).to eq(
         ["Got params: name_p, category_id_p, price_p",
         "Products creates name to name param val, category_id to category_id param val, " <<

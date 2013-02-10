@@ -1,9 +1,14 @@
-require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+describe "AttributeGroups" do
+  subject(:attribute_groups) do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+    AttributeGroups.new
+  end
 
-describe AttributeGroups do
-  subject(:attribute_groups) { AttributeGroups.new }
+  before :all do
+    require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
+  end
 
-  before :each do
+  before do
     stub_const "Main", Module.new
     stub_const "Main::Fake", Class.new
     stub_const "Main::Qqq", Class.new
