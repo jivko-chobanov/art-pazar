@@ -6,6 +6,10 @@ class UpdateOrCreatePage
   def html
     yield if block_given?
   end
+
+  def accomplish
+    yield if block_given?
+  end
 end
 
 require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
@@ -31,6 +35,19 @@ describe ProductCreatePage do
     }).and_return "HTML for create product page"
   end
 
+  def accomplish_prepare_fakes
+    product.should_receive(:attributes_of).with(:for_create).and_return [:name, :price]
+    pipe.should_receive(:get).with(:params, names: [:name, :price], suffix: "_p")
+      .and_return name: "new name", price: "new price"
+    product.should_receive(:create).with(name: "new name", price: "new price")
+
+    product_specifications.should_receive(:attributes_of).with(:for_create)
+      .and_return [:name, :artist]
+    pipe.should_receive(:get).with(:params, names: [:name, :artist], suffix: "_ps")
+      .and_return name: "new name", artist: "new artist"
+    product_specifications.should_receive(:create).with(name: "new name", artist: "new artist")
+  end
+
   before do
     stub_const "Main", Module.new
     stub_const "Main::Products", Class.new
@@ -40,6 +57,10 @@ describe ProductCreatePage do
     Main::Products.stub(:new).and_return product
     Main::ProductSpecifications.stub(:new).and_return product_specifications
     Pipe.stub(:new) { pipe }
+  end
+
+  it "gets pipe" do
+    expect(product_create_page.pipe).to eq pipe
   end
 
   context "loads product and makes create fields html" do
@@ -57,6 +78,22 @@ describe ProductCreatePage do
       load_prepare_fakes :paintings
       html_prepare_fakes
       expect(product_create_page.load_and_get_html :paintings).to eq "HTML for create product page"
+    end
+  end
+
+  context "creates product and its specification" do
+    it "in two steps" do
+      load_prepare_fakes :paintings
+      product_create_page.load :paintings
+
+      accomplish_prepare_fakes
+      expect(product_create_page.accomplish).to be_true
+    end
+
+    it "in one step" do
+      load_prepare_fakes :paintings
+      accomplish_prepare_fakes
+      expect(product_create_page.load_and_do :paintings).to be_true
     end
   end
 end

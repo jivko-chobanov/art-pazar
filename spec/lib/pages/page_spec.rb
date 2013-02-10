@@ -25,6 +25,8 @@ describe Page do
   end
  
   it "raises errors" do
+    expect { any_page.accomplish }.to raise_error RuntimeError
+
     any_page.stub(:pipe_name_of_txt_if_empty_content).and_return false
     expect { any_page.html }.to raise_error RuntimeError
 
@@ -32,6 +34,11 @@ describe Page do
     any_page.load
     expect(any_page.loaded?).to be_true
     expect { any_page.load }.to raise_error RuntimeError
+  end
+
+  it "executes via #accomplish" do
+    any_page.load
+    expect { |block| any_page.accomplish(&block) }.to yield_control
   end
 
   it "displays msg if loaded empty content" do

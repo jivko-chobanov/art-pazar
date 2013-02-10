@@ -19,7 +19,7 @@ describe DataObjects do
     pipe.should_receive(:get)
       .with(:loaded_data_obj_content, expected_second_arg_for_pipe)
       .and_return "content got by pipe"
-    data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group])
+    data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
       .and_return expected_second_arg_for_pipe[:attributes]
     loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
     data_objects.load args_for_load
@@ -35,17 +35,26 @@ describe DataObjects do
     Pipe.stub(:new) { pipe }
   end
 
+  it "initializes with given pipe" do
+    data_objects = DataObjects.new(Products, Pipe.new)
+    expect(data_objects.instance_variable_get :@pipe).to eq pipe
+  end
+
   it "gives attributes of attribute groups" do
-    data_object_attribute_groups.stub(:attributes_of).with(:list).and_return [:name, :price]
+    data_object_attribute_groups.stub(:attributes_of).with(:list, {}).and_return [:name, :price]
     expect(data_objects.attributes_of :list).to eq [:name, :price]
 
-    data_object_attribute_groups.stub(:attributes_of).with(:for_create)
+    data_object_attribute_groups.stub(:attributes_of).with(:list, add_suffix: "_p")
+      .and_return [:name_p, :price_p]
+    expect(data_objects.attributes_of :list, add_suffix: "_p").to eq [:name_p, :price_p]
+
+    data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
       .and_return "attributes for create"
     expect(data_objects.loaded_data_hash_for_create).to eq(
       "DataObjects" => ["attributes for create"]
     )
 
-    data_object_attribute_groups.stub(:attributes_of).with(:qqq).and_raise RuntimeError
+    data_object_attribute_groups.stub(:attributes_of).with(:qqq, {}).and_raise RuntimeError
     expect { data_objects.attributes_of :qqq }.to raise_error RuntimeError
   end
 
@@ -81,22 +90,15 @@ describe DataObjects do
   end
 
   it "creates" do
-    data_object_attribute_groups.stub(:attributes_of).with(:fields_for_create_or_update)
-      .and_return [:name, :category_id, :price]
-
-    expect(new_data_objects.input_fields_html).to eq(
-      "Fill in fields: name, category_id, price"
-    )
-
     attributes = {id: 12, name: "new name", price: 3.10}
     expect { new_data_objects.create attributes }.to raise_error RuntimeError
 
-    data_object_attribute_groups.stub(:attributes_of).with(:fields_for_create_or_update)
+    data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
       .and_return [:valid_attribute1, :v_a2]
     expect { new_data_objects.create name: "valid" }.to raise_error RuntimeError
 
     attributes = {name: "new name", price: 3.10}
-    data_object_attribute_groups.stub(:attributes_of).with(:fields_for_create_or_update)
+    data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
       .and_return attributes.keys
     pipe.should_receive(:put).with("DataObjects", attributes).and_return true
     expect(new_data_objects.create attributes).to be_true
@@ -114,7 +116,7 @@ describe DataObjects do
       expect { data_objects.html }.to raise_error
 
       data_object_attribute_groups.stub(:attributes_of)
-        .with(:list).and_return "attributes of group list"
+        .with(:list, {}).and_return "attributes of group list"
       pipe.should_receive(:get).with(
         :loaded_data_obj_content,
         {:limit => 5, :data_obj_name => "DataObjects", :attributes => "attributes of group list"}
@@ -141,7 +143,7 @@ describe DataObjects do
     end
 
     it "presents create interface" do
-      data_object_attribute_groups.stub(:attributes_of).with(:for_create).and_return [:name, :category_id, :price]
+      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {}).and_return [:name, :category_id, :price]
       pipe.should_receive(:get).with(:html_for_create, data_by_type: { "DataObjects" => [[:name, :category_id, :price]] })
         .and_return "html got by pipe"
       expect(data_objects.html_for_create).to eq "html got by pipe"

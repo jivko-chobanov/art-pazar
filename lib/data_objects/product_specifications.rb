@@ -56,8 +56,8 @@ module Main
       @attribute_groups = AttributeGroups.new @type.attribute_groups_definitions
     end
 
-    def initialize
-      super self.class
+    def initialize(pipe = nil)
+      super self.class, pipe
     end
 
     def specification_names

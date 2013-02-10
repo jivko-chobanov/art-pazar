@@ -33,6 +33,8 @@ class Pipe
 
     if attributes.include? :id
       update data_obj_name, attributes[:id], attributes.select { |name, _| name != :id }
+    else
+      create data_obj_name, attributes
     end
   end
 
@@ -52,6 +54,20 @@ class Pipe
         get_html_for_update
       when :html_for_create
         get_html_for_create
+      when :params
+        suffixed_names = []
+        names_and_values = {}
+        unless @needs_and_input.include? :suffix
+          @needs_and_input[:suffix] = ""
+        end
+
+        @needs_and_input[:names].inject(names_and_values) do |names_and_values, name|
+          if names_and_values.include? name then raise "You have 2 params with the same name" end
+          suffixed_names << (name.to_s + @needs_and_input[:suffix]).to_sym
+          names_and_values.merge! name => "#{name} param val"
+        end
+        log "Got params: " << suffixed_names.join(", ")
+        names_and_values
       when :txt
         case @needs_and_input[:txt]
           when :no_products_for_home_page
@@ -66,10 +82,19 @@ class Pipe
 
   private
 
+  def create(data_obj_name, attributes)
+    if defined? Rails
+    else
+      log "#{data_obj_name} creates " << 
+        attributes.map { |name, value| "#{name} to #{value}" }.join(", ") + "."
+      true
+    end
+  end
+
   def update(data_obj_name, id, attributes)
     if defined? Rails
     else
-      log "Id #{id} of #{data_obj_name} updates " +
+      log "Id #{id} of #{data_obj_name} updates " <<
         attributes.map { |name, value| "#{name} to #{value}" }.join(", ") + "."
       true
     end

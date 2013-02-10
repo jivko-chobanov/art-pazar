@@ -18,13 +18,21 @@ class Page
     elsif loaded?
       yield
     else
-      raise "Cannot generate HTML without data to be loaded first."
+      raise "cannot generate HTML without data to be loaded first"
     end
   end
 
   def load_and_get_html
     load
     html
+  end
+
+  def accomplish
+    if loaded?
+      yield
+    else
+      raise "load first"
+    end
   end
 
   def loaded?

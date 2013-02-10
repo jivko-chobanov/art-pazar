@@ -31,7 +31,11 @@ class AttributeGroups
     end
   end
 
-  def attributes_of(name)
-    get(name).attributes
+  def attributes_of(name, options = {})
+    if options.include? :add_suffix
+      get(name).attributes.map { |name| name.to_s + options[:add_suffix] }.map(&:to_sym)
+    else
+      get(name).attributes
+    end
   end
 end

@@ -1,8 +1,8 @@
 class DataObjects
-  def initialize(child_class)
+  def initialize(child_class, pipe = nil)
     @loaded_data = LoadedData.new
     @is_loaded = false
-    @pipe = Pipe.new
+    pipe ? @pipe = pipe : @pipe = Pipe.new
     @child_class = child_class
   end
 
@@ -44,10 +44,6 @@ class DataObjects
     @pipe.get :html_for_create, data_by_type: loaded_data_hash_for_create
   end
 
-  def input_fields_html
-    "Fill in fields: #{attributes_of(:fields_for_create_or_update).join ", "}"
-  end
-
   def loaded?
     @is_loaded
   end
@@ -69,9 +65,9 @@ class DataObjects
       raise "Cannot create with an id"
     end
 
-    unless (attributes_of(:fields_for_create_or_update) - attributes.keys).empty?
-      raise "Attributes must also contain #{
-        (attributes_of(:fields_for_create_or_update) - attributes.keys).join ", "}."
+    unless (attributes_of(:for_create) - attributes.keys).empty?
+      raise "Attributes #{attributes.keys.join ", "} must also contain #{
+        (attributes_of(:for_create) - attributes.keys).join ", "}."
     end
 
     put attributes
@@ -81,8 +77,8 @@ class DataObjects
     put attributes
   end
 
-  def attributes_of(group_name)
-    @attribute_groups.attributes_of group_name
+  def attributes_of(group_name, options = {})
+    @attribute_groups.attributes_of group_name, options
   end
 
   private
