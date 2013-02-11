@@ -7,22 +7,25 @@ class ProductUpdatePage < UpdateOrCreatePage
     @product_specifications = Main::ProductSpecifications.new @pipe
   end
 
-  def load_from_db(id)
-    load do
-      @product.load_from_db id: id, attribute_group: :for_update, limit: 1 
-      @product_specifications.load_from_db(
-        id: id,
-        type: @product.type,
-        attribute_group: :for_update,
-        limit: 1 
-      )
-    end
-  end
-
-  def load_from_params
-    load do
-      @product.load_from_params
-      @product_specifications.load_from_params type: @product.type
+  def load(from, id = nil)
+    case from
+      when :from_db
+        super() do
+          @product.load_from_db id: id, attribute_group: :for_update, limit: 1 
+          @product_specifications.load_from_db(
+            id: id,
+            type: @product.type,
+            attribute_group: :for_update,
+            limit: 1 
+          )
+        end
+      when :from_params
+        super() do
+          @product.load_from_params
+          @product_specifications.load_from_params type: @product.type
+        end
+      else
+        raise "Does not know how to load from #{from}"
     end
   end
 
@@ -46,14 +49,14 @@ class ProductUpdatePage < UpdateOrCreatePage
     end
   end
 
-  def load_from_params_and_accomplish
-    load_from_params
+  def load_and_accomplish
+    load :from_params
     accomplish
   end
 
-  def load_from_db_and_accomplish(id)
-    load_from_db id
-    accomplish
+  def load_and_get_html(id)
+    load :from_db, id
+    html
   end
 
   private

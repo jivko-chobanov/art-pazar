@@ -64,7 +64,7 @@ describe "ProductUpdatePage" do
   context "loads product and makes update fields html" do
     it "in two steps" do
       load_from_db_prepare_fakes 12
-      product_update_page.load_from_db 12
+      product_update_page.load :from_db, 12
 
       product.stub(:loaded_empty_result?).with(no_args).and_return false
       expect(product_update_page.pipe_name_of_txt_if_empty_content).to eq false
@@ -74,12 +74,15 @@ describe "ProductUpdatePage" do
     end
 
     it "in one step" do
+      load_from_db_prepare_fakes 12
+      html_prepare_fakes
+      expect(product_update_page.load_and_get_html 12).to eq "HTML for update product page"
     end
   end
 
   it "displays msg if no product to load" do
     load_from_db_prepare_fakes 12
-    product_update_page.load_from_db 12
+    product_update_page.load :from_db, 12
 
     product.stub(:loaded_empty_result?).with(no_args).and_return true
     expect(product_update_page.pipe_name_of_txt_if_empty_content).to eq :no_product
@@ -91,13 +94,16 @@ describe "ProductUpdatePage" do
   context "updates product and its specification" do
     it "in two steps" do
       load_from_params_prepare_fakes
-      product_update_page.load_from_params
+      product_update_page.load :from_params
 
       accomplish_prepare_fakes
       expect(product_update_page.accomplish).to be_true
     end
 
     it "in one step" do
+      load_from_params_prepare_fakes
+      accomplish_prepare_fakes
+      expect(product_update_page.load_and_accomplish).to be_true
     end
   end
 end
