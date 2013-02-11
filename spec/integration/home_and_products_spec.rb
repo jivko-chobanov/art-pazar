@@ -1,18 +1,10 @@
+require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
+
 describe "In integration" do
   let(:home) { Home.new }
   let(:product_show_page) { ProductShowPage.new }
   let(:product_update_page) { ProductUpdatePage.new }
   let(:product_create_page) { ProductCreatePage.new }
-
-  before :all do
-    object_constants_before_loading_lib = Object.constants
-    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
-    @object_constants_to_be_removed = Object.constants - object_constants_before_loading_lib
-  end
-
-  after :all do
-    @object_constants_to_be_removed.each { |const| Object.send :remove_const, const }
-  end
 
   context "Home" do
     it "makes html for products" do
