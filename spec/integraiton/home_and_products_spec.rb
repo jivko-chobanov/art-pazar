@@ -1,10 +1,20 @@
-describe "Home" do
-  subject(:home) do
+describe "In integration" do
+  let(:home) { Home.new }
+  let(:product_show_page) { ProductShowPage.new }
+  let(:product_update_page) { ProductUpdatePage.new }
+  let(:product_create_page) { ProductCreatePage.new }
+
+  before :all do
+    object_constants_before_loading_lib = Object.constants
     require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
-    Home.new
+    @object_constants_to_be_removed = Object.constants - object_constants_before_loading_lib
   end
 
-  context "in integration:" do
+  after :all do
+    @object_constants_to_be_removed.each { |const| Object.send :remove_const, const }
+  end
+
+  context "Home" do
     it "makes html for products" do
       expect(home.load_and_get_html).to eq "HTML for Products
 
@@ -23,15 +33,8 @@ name value (9)  14.43
 "
     end
   end
-end
 
-describe "ProductShowPage" do
-  subject(:product_show_page) do
-    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
-    ProductShowPage.new
-  end
-
-  context "in integration:" do
+  context "ProductShowPage" do
     it "gets product page html"do
       expect(product_show_page.load_and_get_html).to eq(
 "HTML for Products, ProductSpecifications
@@ -45,15 +48,8 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
 ")
     end
   end
-end
 
-describe "ProductUpdatePage" do
-  subject(:product_update_page) do
-    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
-    ProductUpdatePage.new
-  end
-
-  context "in integration:" do
+  context "ProductUpdatePage" do
     it "gets product update page html" do
       expect(product_update_page.load_and_get_html 123).to eq(
 "HTML for updating Products, ProductSpecifications fields:
@@ -78,15 +74,8 @@ smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"value2 (0)\", 
       )
     end
   end
-end
 
-describe "ProductCreatePage" do
-  subject(:product_create_page) do
-    require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
-    ProductCreatePage.new
-  end
-
-  context "in integration:" do
+  context "ProductCreatePage" do
     it "gets product create page html" do
       expect(product_create_page.load_and_get_html :paintings).to eq(
 "HTML for creating Products, ProductSpecifications with fields:

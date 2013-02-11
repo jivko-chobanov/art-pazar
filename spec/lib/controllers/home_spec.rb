@@ -6,7 +6,7 @@ describe "Home" do
   end
 
   def load_prepare_fakes
-    products.stub(:load)
+    products.stub(:load_from_db)
       .with attribute_group: :list, order: :last, limit: 10
   end
 

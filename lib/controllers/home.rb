@@ -7,7 +7,7 @@ class Home < ShowPage
 
   def load
     super do
-      @products.load(
+      @products.load_from_db(
         attribute_group: :list,
         order: :last,
         limit: 10

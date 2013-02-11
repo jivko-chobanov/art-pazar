@@ -24,6 +24,7 @@ describe "ProductShowPage" do
   end
 
   before do
+    stub_const "Page", Class.new
     stub_const "ShowPage", Class.new
     stub_const "Main", Module.new
     stub_const "Main::Products", Class.new
