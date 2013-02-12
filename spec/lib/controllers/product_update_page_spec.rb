@@ -8,9 +8,9 @@ describe "ProductUpdatePage" do
   end
 
   def load_from_params_prepare_fakes
-    product.stub(:load_from_params)
+    product.stub(:load_from_params).with attribute_group: :for_update
     product.should_receive(:type).and_return :paintings
-    product_specifications.stub(:load_from_params).with type: :paintings
+    product_specifications.stub(:load_from_params).with attribute_group: :for_update, type: :paintings
   end
 
   def load_from_db_prepare_fakes(id)
@@ -30,16 +30,8 @@ describe "ProductUpdatePage" do
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:attributes_of).with(:for_update).and_return [:name, :price]
-    pipe.should_receive(:get).with(:params, names: [:name, :price], suffix: "_p")
-      .and_return name: "new name", price: "new price"
-    product.should_receive(:update).with(name: "new name", price: "new price")
-
-    product_specifications.should_receive(:attributes_of).with(:for_update)
-      .and_return [:name, :artist]
-    pipe.should_receive(:get).with(:params, names: [:name, :artist], suffix: "_ps")
-      .and_return name: "new name", artist: "new artist"
-    product_specifications.should_receive(:update).with(name: "new name", artist: "new artist")
+    product.should_receive(:update).with(no_args())
+    product_specifications.should_receive(:update).with(no_args())
   end
 
   before do

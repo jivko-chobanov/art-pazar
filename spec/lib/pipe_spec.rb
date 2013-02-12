@@ -46,6 +46,11 @@ describe "Pipe" do
   end
 
   unless defined? Rails
+    it "gets last created id of data_obj_name (fake)" do
+      expect(pipe.get :last_created_id, data_obj_name: "any").to be_> 0
+      expect { pipe.get :last_created_id, "other" }.to raise_error RuntimeError
+    end
+
     it "creates a record in the database" do
       expect(pipe.put "Products", name: "new name", price: 2).to be_true
       expect(pipe.last_logged).to eq "Products creates name to new name, price to 2."
@@ -64,12 +69,6 @@ describe "Pipe" do
       it "gets them for data object" do
         expect(pipe.get :params, names: [:name, :price])
           .to eq name: "name param val", price: "price param val"
-      end
-
-      it "gets suffixed params and gives them without it" do
-        expect(pipe.get :params, names: [:name, :price], suffix: "_ok")
-          .to eq name: "name param val", price: "price param val"
-        expect(pipe.last_logged).to eq "Got params: name_ok, price_ok"
       end
 
       it "raises error on same param name twice in the list" do

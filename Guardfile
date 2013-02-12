@@ -6,7 +6,7 @@ group :backend do
   end
 end
 
-group :unit_tests do
+group :u do
   guard :rspec, spec_paths: ['spec/lib'] do
     ignore %r{^.+(\.swp$|\.swo$|\~$)}
 
@@ -18,7 +18,7 @@ group :unit_tests do
   end
 end
 
-group :integration_tests do
+group :i do
   guard :rspec, spec_paths: ['spec/integration'] do
     ignore %r{^.+(\.swp$|\.swo$|\~$)}
 

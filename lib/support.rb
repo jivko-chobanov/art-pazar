@@ -1,4 +1,22 @@
 class Support
+  class << self
+    def add_suffix(array, suffix)
+      array.map do |value|
+        if value.is_a? Symbol
+          (value.to_s + suffix).to_sym
+        else
+          value + suffix
+        end
+      end
+    end
+
+    def remove_suffix_from_keys(hash, suffix)
+      hash.each_with_object({}) do |(suffixed_name, value), unsuffixed_hash|
+        unsuffixed_hash[suffixed_name.to_s.gsub(/#{suffix}$/, '').to_sym] = value
+      end
+    end
+  end
+
   module DataToTableString
     def as_table_string(ordered_rows_with_cells_described)
       ordered_rows_with_cells_described = column_names_to_head_row ordered_rows_with_cells_described

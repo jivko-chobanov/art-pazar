@@ -54,20 +54,20 @@ class Pipe
         get_html_for_update
       when :html_for_create
         get_html_for_create
+      when :last_created_id
+        if needs_and_input.include? :data_obj_name
+          24
+        else
+          raise "needs_and_input does not include :data_obj_name"
+        end
       when :params
-        suffixed_names = []
-        names_and_values = {}
-        unless @needs_and_input.include? :suffix
-          @needs_and_input[:suffix] = ""
+        values_by_name = {}
+        @needs_and_input[:names].inject(values_by_name) do |values_by_name, name|
+          if values_by_name.include? name then raise "You have 2 params with the same name" end
+          values_by_name.merge! name => "#{name} param val"
         end
-
-        @needs_and_input[:names].inject(names_and_values) do |names_and_values, name|
-          if names_and_values.include? name then raise "You have 2 params with the same name" end
-          suffixed_names << (name.to_s + @needs_and_input[:suffix]).to_sym
-          names_and_values.merge! name => "#{name} param val"
-        end
-        log "Got params: " << suffixed_names.join(", ")
-        names_and_values
+        log "Got params: " << values_by_name.map { |name, value| "#{name} = #{value}" }.join(", ")
+        values_by_name
       when :txt
         case @needs_and_input[:txt]
           when :no_products_for_home_page

@@ -57,7 +57,7 @@ module Main
     end
 
     def initialize(pipe = nil)
-      super self.class, pipe
+      super self.class, "PrS", pipe
     end
 
     def specification_names
@@ -70,6 +70,20 @@ module Main
       if type_set?
         super attribute_group
       end
+    end
+
+    def create(attributes_or_product_id = nil)
+      if attributes_or_product_id.is_a? Fixnum
+        attributes, product_id = nil, attributes_or_product_id
+      else
+        attributes, product_id = attributes_or_product_id, nil
+      end
+
+      unless product_id.nil?
+        @loaded_data.merge_to(data_obj_name, product_id: product_id)
+      end
+
+      super(attributes)
     end
 
     private

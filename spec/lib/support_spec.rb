@@ -3,6 +3,25 @@ describe "Support" do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
   end
 
+  it "adds suffix to array" do
+    expect(Support.add_suffix ["abc", "efg"], " is ok").to eq ["abc is ok", "efg is ok"]
+    expect(Support.add_suffix [], " is ok").to eq []
+    expect(Support.add_suffix ["abc", "efg"], "").to eq ["abc", "efg"]
+  end
+
+  it "removes suffix from the keys of a hash" do
+    expect(Support.remove_suffix_from_keys({abc_ok: "lala", efg_ok: "koko"}, "_ok")).to eq(
+      {abc: "lala", efg: "koko"})
+
+    expect(
+      Support.remove_suffix_from_keys({"abc_ok" => "lala_ok", "efg_ok" => "koko_ok"}, "_ok")
+    ).to eq abc: "lala_ok", efg: "koko_ok"
+
+    expect(Support.remove_suffix_from_keys({"abc_ok" => "lala", "efg_ok" => "koko"}, "")).to eq(
+      {abc_ok: "lala", efg_ok: "koko"})
+    expect(Support.remove_suffix_from_keys({}, "_ok")).to eq({})
+  end
+
   it "transforms ordered array of hashes with keys = column names to string which looks like table in the console with labeled columns on the top" do
     html = Support.as_table_string([
       {name: "My name", price: 5.43},

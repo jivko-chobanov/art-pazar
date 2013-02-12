@@ -7,7 +7,15 @@ describe "ProductCreatePage" do
     ProductCreatePage.new
   end
 
-  def load_prepare_fakes(type)
+  def load_from_params_prepare_fakes(type)
+    product_specifications.should_receive(:type=).with type
+    product.should_receive(:load_from_params).with attribute_group: :for_create
+    product.should_receive(:type).with(no_args()).and_return :paintings
+    product_specifications.should_receive(:load_from_params)
+      .with attribute_group: :for_create, type: :paintings
+  end
+
+  def load_from_args_prepare_fakes(type)
     product_specifications.should_receive(:type=).with type
   end
 
@@ -21,16 +29,9 @@ describe "ProductCreatePage" do
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:attributes_of).with(:for_create).and_return [:name, :price]
-    pipe.should_receive(:get).with(:params, names: [:name, :price], suffix: "_p")
-      .and_return name: "new name", price: "new price"
-    product.should_receive(:create).with(name: "new name", price: "new price")
-
-    product_specifications.should_receive(:attributes_of).with(:for_create)
-      .and_return [:name, :artist]
-    pipe.should_receive(:get).with(:params, names: [:name, :artist], suffix: "_ps")
-      .and_return name: "new name", artist: "new artist"
-    product_specifications.should_receive(:create).with(name: "new name", artist: "new artist")
+    product.should_receive(:create).with(no_args())
+    product.should_receive(:id).with(no_args()).and_return 12
+    product_specifications.should_receive(:create).with(12)
   end
 
   before do
@@ -54,8 +55,8 @@ describe "ProductCreatePage" do
 
   context "loads product and makes create fields html" do
     it "in two steps" do
-      load_prepare_fakes :paintings
-      product_create_page.load :paintings
+      load_from_args_prepare_fakes :paintings
+      product_create_page.load :from_args, :paintings
 
       expect(product_create_page.pipe_name_of_txt_if_empty_content).to eq false
 
@@ -64,7 +65,7 @@ describe "ProductCreatePage" do
     end
 
     it "in one step" do
-      load_prepare_fakes :paintings
+      load_from_args_prepare_fakes :paintings
       html_prepare_fakes
       expect(product_create_page.load_and_get_html :paintings).to eq "HTML for create product page"
     end
@@ -72,15 +73,15 @@ describe "ProductCreatePage" do
 
   context "creates product and its specification" do
     it "in two steps" do
-      load_prepare_fakes :paintings
-      product_create_page.load :paintings
+      load_from_params_prepare_fakes :paintings
+      product_create_page.load :from_params, :paintings
 
       accomplish_prepare_fakes
       expect(product_create_page.accomplish).to be_true
     end
 
     it "in one step" do
-      load_prepare_fakes :paintings
+      load_from_params_prepare_fakes :paintings
       accomplish_prepare_fakes
       expect(product_create_page.load_and_accomplish :paintings).to be_true
     end

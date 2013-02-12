@@ -21,8 +21,8 @@ class ProductUpdatePage < UpdateOrCreatePage
         end
       when :from_params
         super() do
-          @product.load_from_params
-          @product_specifications.load_from_params type: @product.type
+          @product.load_from_params attribute_group: :for_update
+          @product_specifications.load_from_params attribute_group: :for_update, type: @product.type
         end
       else
         raise "Does not know how to load from #{from}"
@@ -43,8 +43,8 @@ class ProductUpdatePage < UpdateOrCreatePage
 
   def accomplish
     super do
-      update_data_obj_using_params @product, "_p"
-      update_data_obj_using_params @product_specifications, "_ps"
+      @product.update 
+      @product_specifications.update 
       true
     end
   end
@@ -57,13 +57,5 @@ class ProductUpdatePage < UpdateOrCreatePage
   def load_and_get_html(id)
     load :from_db, id
     html
-  end
-
-  private
-
-  def update_data_obj_using_params(data_object, params_suffix)
-    data_object.update @pipe.get :params,
-      {names: data_object.attributes_of(:for_update),
-      suffix: params_suffix}
   end
 end

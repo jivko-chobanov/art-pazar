@@ -8,7 +8,7 @@ describe "DataObjects" do
   end
 
   def new_data_objects
-    data_objects = DataObjects.new(Products)
+    data_objects = DataObjects.new(Products, "Pr")
 
     data_objects.instance_variable_set :@attribute_groups, data_object_attribute_groups
     data_objects.instance_variable_set :@pipe, pipe
@@ -16,12 +16,34 @@ describe "DataObjects" do
     data_objects
   end
 
-  def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
-    pipe.should_receive(:get).with(*expected_args_for_pipe)
-      .and_return "content got by pipe"
+  def prep_load_from_db(data_objects, args_for_load, expected_args_for_pipe)
     data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
       .and_return expected_args_for_pipe[1][:attributes]
+    pipe.should_receive(:get).with(*expected_args_for_pipe)
+      .and_return "content got by pipe"
     loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
+  end
+
+  def prep_load_from_params(data_objects, args_for_load, expected_args_for_pipe)
+    data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
+      .and_return expected_args_for_pipe[1][:names]
+    Support.should_receive(:add_suffix).with(expected_args_for_pipe[1][:names], "_Pr")
+      .and_return expected_args_for_pipe[1][:names]
+    pipe.should_receive(:get).with(*expected_args_for_pipe)
+      .and_return "content got by pipe"
+    Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
+      .and_return "content got by pipe"
+    loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
+  end
+
+  def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
+    if load_method == :load_from_params
+      prep_load_from_params data_objects, args_for_load, expected_args_for_pipe
+    elsif load_method == :load_from_db
+      prep_load_from_db data_objects, args_for_load, expected_args_for_pipe
+    else
+      raise "my rspec helper needs help"
+    end
     data_objects.send load_method, args_for_load
   end
 
@@ -34,13 +56,14 @@ describe "DataObjects" do
     stub_const "LoadedData", Class.new
     stub_const "Pipe", Class.new
     stub_const "Products", Class.new
+    stub_const "Support", Class.new
 
     LoadedData.stub(:new) { loaded_data }
     Pipe.stub(:new) { pipe }
   end
 
   it "initializes with given pipe" do
-    data_objects = DataObjects.new(Products, Pipe.new)
+    data_objects = DataObjects.new(Products, "Pr", Pipe.new)
     expect(data_objects.instance_variable_get :@pipe).to eq pipe
   end
 
@@ -73,7 +96,7 @@ describe "DataObjects" do
   end
 
   it "gives information about data" do
-    expect(DataObjects.new(Products).data_obj_name).to eq "DataObjects"
+    expect(DataObjects.new(Products, "Pr").data_obj_name).to eq "DataObjects"
 
     empty_data_objects = new_data_objects
     expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError
@@ -96,8 +119,8 @@ describe "DataObjects" do
   context "when loading" do
     it "from params" do
       load_with_args :load_from_params, data_objects,
-        {attribute_group: :for_create, suffix: "_ok"},
-        [:params, {attributes: [:name, :price], suffix: "_ok"}]
+        {attribute_group: :for_create},
+        [:params, {names: [:name, :price]}]
     end
 
     it "from database" do
@@ -111,33 +134,83 @@ describe "DataObjects" do
       end
 
       it "from params" do
-        expect { data_objects.load_from_params suffix: "_ok" }.to raise_error RuntimeError
+        expect { data_objects.load_from_params any_key: :any_val }.to raise_error RuntimeError
       end
     end
   end
 
-  it "creates" do
-    attributes = {id: 12, name: "new name", price: 3.10}
-    expect { new_data_objects.create attributes }.to raise_error RuntimeError
+  context "creates" do
+    it "from given attributes" do
+      attributes = {id: 12, name: "new name", price: 3.10}
+      expect { new_data_objects.create attributes }.to raise_error RuntimeError
 
-    data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
-      .and_return [:valid_attribute1, :v_a2]
-    expect { new_data_objects.create name: "valid" }.to raise_error RuntimeError
+      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+        .and_return [:valid_attribute1, :v_a2]
+      expect { new_data_objects.create name: "valid" }.to raise_error RuntimeError
 
-    attributes = {name: "new name", price: 3.10}
-    data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
-      .and_return attributes.keys
-    pipe.should_receive(:put).with("DataObjects", attributes).and_return true
-    expect(new_data_objects.create attributes).to be_true
+      attributes = {name: "new name", price: 3.10}
+      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+        .and_return attributes.keys
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+      loaded_data.should_receive(:merge_to).with "DataObjects", id: 24
+      expect(new_data_objects.create attributes).to be_true
+    end
+
+    it "from loaded data" do
+      attributes = {name: "new name", price: 3.10}
+      loaded_data.stub(:get).with("DataObjects").and_return attributes
+      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+        .and_return attributes.keys
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+      loaded_data.should_receive(:merge_to).with "DataObjects", id: 24
+      expect(new_data_objects.create).to be_true
+    end
+
+    it "loads and creates in one step" do
+      attributes = {name: "new name", price: 3.10}
+      prep_load_from_params data_objects, {attribute_group: :for_create},
+        [:params, {names: attributes.keys}]
+      loaded_data.should_receive(:get).with("DataObjects").and_return attributes
+      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+        .and_return attributes.keys
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+      loaded_data.should_receive(:merge_to).with "DataObjects", id: 24
+      expect(new_data_objects.load_and_create).to be_true
+    end
   end
 
-  it "updates" do
-    attributes = {name: "new name", price: 3.10}
-    expect { new_data_objects.update attributes }.to raise_error RuntimeError
+  context "updates" do
+    it "from given attributes" do
+      attributes = {name: "new name", price: 3.10}
+      expect { new_data_objects.update attributes }.to raise_error RuntimeError
 
-    attributes = {id: 12, name: "new name", price: 3.10}
-    pipe.should_receive(:put).with("DataObjects", attributes).and_return true
-    expect(data_objects.update attributes).to be_true
+      attributes = {id: 12, name: "new name", price: 3.10}
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      expect(data_objects.update attributes).to be_true
+    end
+
+    it "from loaded data" do
+      attributes = {id: 14, name: "new name", price: 3.10}
+      loaded_data.stub(:get).with("DataObjects").and_return attributes
+      data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
+        .and_return attributes.keys
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      expect(new_data_objects.update).to be_true
+    end
+
+    it "loads and updates in one step" do
+      attributes = {id: 18, name: "new name", price: 3.10}
+      prep_load_from_params data_objects, {attribute_group: :for_update},
+        [:params, {names: attributes.keys}]
+      loaded_data.should_receive(:get).with("DataObjects").and_return attributes
+      data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
+        .and_return attributes.keys
+      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+      expect(new_data_objects.load_and_update).to be_true
+    end
   end
 
   context "when html is wanted" do

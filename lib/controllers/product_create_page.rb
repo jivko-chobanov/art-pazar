@@ -7,9 +7,20 @@ class ProductCreatePage < UpdateOrCreatePage
     @product_specifications = Main::ProductSpecifications.new @pipe
   end
 
-  def load(product_type)
-    super() do
-      @product_specifications.type = product_type
+  def load(from, product_type)
+    case from
+      when :from_args
+        super() do
+          @product_specifications.type = product_type
+        end
+      when :from_params
+        super() do
+          @product_specifications.type = product_type
+          @product.load_from_params attribute_group: :for_create
+          @product_specifications.load_from_params attribute_group: :for_create, type: @product.type
+        end
+      else
+        raise "Does not know how to load from #{from}"
     end
   end
 
@@ -26,28 +37,20 @@ class ProductCreatePage < UpdateOrCreatePage
   end
 
   def load_and_get_html(product_type)
-    load product_type
+    load :from_args, product_type
     html
   end
   
   def accomplish
     super do
-      create_data_obj_using_params @product, "_p"
-      create_data_obj_using_params @product_specifications, "_ps"
+      @product.create
+      @product_specifications.create @product.id
       true
     end
   end
 
   def load_and_accomplish(product_type)
-    load product_type
+    load :from_params, product_type
     accomplish
-  end
-  
-  private
-
-  def create_data_obj_using_params(data_object, params_suffix)
-    data_object.create @pipe.get :params,
-      {names: data_object.attributes_of(:for_create),
-      suffix: params_suffix}
   end
 end

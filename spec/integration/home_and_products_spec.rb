@@ -54,7 +54,7 @@ smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"value2 (0)\", 
     end
 
     it "updates product and product specification" do
-      expect(product_update_page.load_and_accomplish 123).to eq true
+      expect(product_update_page.load_and_accomplish).to eq true
       expect(product_update_page.pipe.logs).to eq(
         ["Got params: name_p, category_id_p, price_p",
         "Products updates name to name param val, category_id to category_id param val, " <<
@@ -82,13 +82,16 @@ string_1, smallint_1, string_2, string_3
     it "creates product and product specification" do
       expect(product_create_page.load_and_accomplish :paintings).to eq true
       expect(product_create_page.pipe.logs).to eq(
-        ["Got params: name_p, category_id_p, price_p",
-        "Products creates name to name param val, category_id to category_id param val, " <<
-          "price to price param val.",
-        "Got params: string_1_ps, smallint_1_ps, string_2_ps, string_3_ps",
-        "ProductSpecifications creates string_1 to string_1 param val, " <<
-          "smallint_1 to smallint_1 param val, string_2 to string_2 param val, " <<
-          "string_3 to string_3 param val."]
+        ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
+          "param val, price_Pr = price_Pr param val",
+        "Got params: string_1_PrS " <<
+          "= string_1_PrS param val, smallint_1_PrS = smallint_1_PrS param val, " <<
+          "string_2_PrS = string_2_PrS param val, string_3_PrS = string_3_PrS param val",
+        "Products creates name to name_Pr param val, category_id to " <<
+          "category_id_Pr param val, price to price_Pr param val.",
+        "ProductSpecifications creates string_1 to string_1_PrS param val, " <<
+          "smallint_1 to smallint_1_PrS param val, string_2 to string_2_PrS " <<
+          "param val, string_3 to string_3_PrS param val, product_id to 24."]
       )
     end
   end
