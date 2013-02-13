@@ -13,6 +13,7 @@ describe "AttributeGroups" do
     stub_const "Main::Fake", Class.new
     stub_const "Main::Qqq", Class.new
     stub_const "Main::OtherFake", Class.new
+    stub_const "Support", Class.new
   end
 
   it "can add group definition on initialization" do
@@ -27,7 +28,8 @@ describe "AttributeGroups" do
     expect { attribute_groups.put :list, [:other, :price] }.to raise_error
 
     expect(attribute_groups.attributes_of :list).to eq [:name, :price]
-    expect(attribute_groups.attributes_of :list, add_suffix: "_ok").to eq [:name_ok, :price_ok]
+    Support.should_receive(:add_suffix).with([:name, :price], "_ok").and_return [:name_ok, :price_ok]
+    expect(attribute_groups.attributes_of :list, suffix_to_be_added: "_ok").to eq [:name_ok, :price_ok]
     expect { attribute_groups.attributes_of :qqq }.to raise_error
 
     attribute_groups.put :other, [:id, :category]

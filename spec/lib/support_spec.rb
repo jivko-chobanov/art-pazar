@@ -12,13 +12,15 @@ describe "Support" do
   it "removes suffix from the keys of a hash" do
     expect(Support.remove_suffix_from_keys({abc_ok: "lala", efg_ok: "koko"}, "_ok")).to eq(
       {abc: "lala", efg: "koko"})
+    expect(Support.remove_suffix_from_keys({abc_ok: "lala", efg: "koko"}, "_ok")).to eq(
+      {abc: "lala", efg: "koko"})
 
     expect(
       Support.remove_suffix_from_keys({"abc_ok" => "lala_ok", "efg_ok" => "koko_ok"}, "_ok")
-    ).to eq abc: "lala_ok", efg: "koko_ok"
+    ).to eq "abc" => "lala_ok", "efg" => "koko_ok"
 
     expect(Support.remove_suffix_from_keys({"abc_ok" => "lala", "efg_ok" => "koko"}, "")).to eq(
-      {abc_ok: "lala", efg_ok: "koko"})
+      {"abc_ok" => "lala", "efg_ok" => "koko"})
     expect(Support.remove_suffix_from_keys({}, "_ok")).to eq({})
   end
 

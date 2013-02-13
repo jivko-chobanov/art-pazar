@@ -11,8 +11,13 @@ class Support
     end
 
     def remove_suffix_from_keys(hash, suffix)
-      hash.each_with_object({}) do |(suffixed_name, value), unsuffixed_hash|
-        unsuffixed_hash[suffixed_name.to_s.gsub(/#{suffix}$/, '').to_sym] = value
+      hash.each_with_object({}) do |(suffixed_key, value), unsuffixed_hash|
+        unsuffix = ->(word) { word.gsub(/#{suffix}$/, '') }
+        if suffixed_key.is_a? Symbol
+          unsuffixed_hash[unsuffix.(suffixed_key.to_s).to_sym] = value
+        else
+          unsuffixed_hash[unsuffix.(suffixed_key)] = value
+        end
       end
     end
   end
