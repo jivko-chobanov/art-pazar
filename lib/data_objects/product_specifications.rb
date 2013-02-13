@@ -70,7 +70,11 @@ module Main
     end
 
     def initialize(pipe = nil)
-      super self.class, "PrS", pipe
+      super pipe
+    end
+
+    def class_abbreviation
+      "PrS"
     end
 
     def specification_names

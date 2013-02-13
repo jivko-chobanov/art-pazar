@@ -1,9 +1,8 @@
 class DataObjects
-  def initialize(child_class, child_class_unique_abbreviation, pipe = nil)
+  def initialize(pipe = nil)
     @table = Table.new
     @is_loaded = false
     pipe ? @pipe = pipe : @pipe = Pipe.new
-    @child_class, @child_class_unique_abbreviation = child_class, child_class_unique_abbreviation
   end
 
   def load_from_params(needs)
@@ -13,7 +12,7 @@ class DataObjects
 
     @is_loaded = true
 
-    suffix = "_" + @child_class_unique_abbreviation
+    suffix = "_" + class_abbreviation
 
     needs[:names] = Support.add_suffix attributes_of(needs[:attribute_group]), suffix
     needs.delete :attribute_group

@@ -7,7 +7,11 @@ module Main
         for_update: [:id, :name, :category_id, :price],
         for_create: [:name, :category_id, :price],
       )
-      super self.class, "Pr", pipe
+      super pipe
+    end
+
+    def class_abbreviation
+      "Pr"
     end
 
     def id

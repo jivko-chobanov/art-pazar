@@ -84,4 +84,11 @@ describe "Main::ProductSpecifications" do
       expect(product_specifications.create 12).to eq "true from super with args: "
     end
   end
+
+  context "general information:" do
+    it "gives abbreviation" do
+      expect(product_specifications.class_abbreviation).to be_kind_of String
+      expect(product_specifications.class_abbreviation).not_to be_empty
+    end
+  end
 end

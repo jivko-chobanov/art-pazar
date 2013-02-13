@@ -8,7 +8,7 @@ describe "DataObjects" do
   end
 
   def new_data_objects
-    data_objects = DataObjects.new(Products, "Pr")
+    data_objects = DataObjects.new
 
     data_objects.instance_variable_set :@attribute_groups, data_object_attribute_groups
     data_objects.instance_variable_set :@pipe, pipe
@@ -25,6 +25,7 @@ describe "DataObjects" do
   end
 
   def prep_load_from_params(data_objects, args_for_load, expected_args_for_pipe)
+    DataObjects.send(:define_method, :class_abbreviation) { "Pr" }
     data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
       .and_return expected_args_for_pipe[1][:names]
     Support.should_receive(:add_suffix).with(expected_args_for_pipe[1][:names], "_Pr")
@@ -63,7 +64,7 @@ describe "DataObjects" do
   end
 
   it "initializes with given pipe" do
-    data_objects = DataObjects.new(Products, "Pr", Pipe.new)
+    data_objects = DataObjects.new(Pipe.new)
     expect(data_objects.instance_variable_get :@pipe).to eq pipe
   end
 
@@ -97,7 +98,7 @@ describe "DataObjects" do
   end
 
   it "gives information about data" do
-    expect(DataObjects.new(Products, "Pr").data_obj_name).to eq "DataObjects"
+    expect(DataObjects.new.data_obj_name).to eq "DataObjects"
 
     empty_data_objects = new_data_objects
     expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError

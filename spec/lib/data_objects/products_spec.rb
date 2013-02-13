@@ -62,4 +62,11 @@ describe "Main::Products" do
       end
     end
   end
+
+  context "general information:" do
+    it "gives abbreviation" do
+      expect(products.class_abbreviation).to be_kind_of String
+      expect(products.class_abbreviation).not_to be_empty
+    end
+  end
 end
