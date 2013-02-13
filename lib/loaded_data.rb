@@ -6,15 +6,15 @@ class LoadedData
   end
 
   def put(data_type, data)
-    must_not_exist(data_type) { @data_by_type[data_type] = data }
+    must_be_free_then(data_type) { @data_by_type[data_type] = data }
   end
 
   def replace(data_type, new_data)
-    must_exist(data_type) { @data_by_type[data_type] = new_data }
+    must_exist_then(data_type) { @data_by_type[data_type] = new_data }
   end
 
   def get(data_type)
-    must_exist(data_type) { @data_by_type[data_type] }
+    must_exist_then(data_type) { @data_by_type[data_type] }
   end
 
   def to_hash
@@ -39,7 +39,7 @@ class LoadedData
 
   private
 
-  def must_not_exist(data_type)
+  def must_be_free_then(data_type)
     if @data_by_type.include? data_type
       raise "#{data_type} does exist"
     else
@@ -47,7 +47,7 @@ class LoadedData
     end
   end
 
-  def must_exist(data_type)
+  def must_exist_then(data_type)
     if @data_by_type.include? data_type
       yield
     else

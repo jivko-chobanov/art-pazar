@@ -1,5 +1,6 @@
 class LibPaths
   attr_reader :absolute_paths
+
   def initialize
     @root_path = __FILE__.split('/art_pazar/').first << '/art_pazar/lib/'
     @relative_paths = [ 'pipe',
