@@ -37,12 +37,20 @@ describe "ProductShowPage" do
     ShowPage.send(:define_method, :html) { |&block| block.call }
   end
 
-  it "loads product and makes html in two steps" do
-    load_prepare_fakes 12, :paintings
-    product_show_page.load 12
+  context "loads product and makes html" do
+    it "in two steps" do
+      load_prepare_fakes 12, :paintings
+      product_show_page.load 12
 
-    html_prepare_fakes
-    expect(product_show_page.html).to eq "HTML for product page"
+      html_prepare_fakes
+      expect(product_show_page.html).to eq "HTML for product page"
+    end
+
+    it "in one step" do
+      load_prepare_fakes 12, :paintings
+      html_prepare_fakes
+      expect(product_show_page.load_and_get_html 12).to eq "HTML for product page"
+    end
   end
 
   it "displays msg if no product to load" do

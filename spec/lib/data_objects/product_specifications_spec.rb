@@ -14,6 +14,8 @@ describe "Main::ProductSpecifications" do
 
     AttributeGroups.stub(:new).with(kind_of Hash) { product_attribute_groups }
     DataObjects.send(:define_method, :initialize) { |*args| }
+    DataObjects.send(:define_method, :load_from_params) { |*args| }
+    DataObjects.send(:define_method, :load_from_db) { |*args| }
     DataObjects.send(:define_method, :attributes_of) { |*args| "attributes from super" }
     DataObjects.send(:define_method, :create) do |*args|
       "true from super with args: #{args.join ", "}"
@@ -28,6 +30,18 @@ describe "Main::ProductSpecifications" do
 
       it "specification_names" do
         expect { product_specifications.specification_names }.to raise_error RuntimeError
+      end
+    end
+
+    context "can set type on doing something else" do
+      it "loads from params" do
+        product_specifications.load_from_params any: :any, type: :paintings
+        expect(product_specifications.type).to eq :paintings
+      end
+
+      it "loads from db" do
+        product_specifications.load_from_db any: :any, type: :paintings
+        expect(product_specifications.type).to eq :paintings
       end
     end
   end
@@ -48,7 +62,11 @@ describe "Main::ProductSpecifications" do
     end
 
     it "interprets its fields differently for every product type" do
-      expect(product_specifications.specification_names).to eq [:year, :artist, :paint, :frames]
+      expect(product_specifications.specification_names).to eq [:id, :year, :artist, :paint, :frames]
+    end
+
+    it "gives type" do
+      expect(product_specifications.type).to eq :paintings
     end
   end
 

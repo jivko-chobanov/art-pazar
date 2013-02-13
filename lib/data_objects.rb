@@ -31,6 +31,8 @@ class DataObjects
     needs[:attributes] = attributes_of needs[:attribute_group]
     needs.delete :attribute_group
 
+    needs[:data_obj_name] = data_obj_name
+
     @loaded_data.put data_obj_name, @pipe.get(:loaded_data_obj_content, needs)
   end
 

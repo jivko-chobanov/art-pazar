@@ -24,6 +24,11 @@ class ProductShowPage < ShowPage
     end
   end
 
+  def load_and_get_html(id)
+    load id
+    html
+  end
+
   def pipe_name_of_txt_if_empty_content
     @product.loaded_empty_result? ? :no_product : false
   end

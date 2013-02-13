@@ -89,7 +89,8 @@ describe "DataObjects" do
     expect { data_objects.loaded_data_hash }.to raise_error RuntimeError
 
     load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 2},
-      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 2}]
+      [:loaded_data_obj_content,
+        {attributes: [:name, :price], limit: 2, data_obj_name: "DataObjects"}]
 
     loaded_data.stub(:to_hash).and_return "content got by pipe to hash"
     expect(data_objects.loaded_data_hash).to eq "content got by pipe to hash"
@@ -103,7 +104,8 @@ describe "DataObjects" do
     expect(empty_data_objects.loaded?).to be_false
 
     load_with_args :load_from_db, empty_data_objects, {attribute_group: :list, limit: 0},
-      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 0}]
+      [:loaded_data_obj_content,
+        {attributes: [:name, :price], limit: 0, data_obj_name: "DataObjects"}]
 
     loaded_data.stub(:empty?).and_return true
     expect(empty_data_objects.loaded?).to be_true
@@ -111,7 +113,8 @@ describe "DataObjects" do
 
     not_empty_data_objects = new_data_objects
     load_with_args :load_from_db, not_empty_data_objects, {attribute_group: :list, limit: 1},
-      [:loaded_data_obj_content, {attributes: [:name, :price], limit: 1}]
+      [:loaded_data_obj_content,
+        {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
     loaded_data.stub(:empty?).and_return false
     expect(not_empty_data_objects.loaded_empty_result?).to be_false
   end
@@ -125,7 +128,8 @@ describe "DataObjects" do
 
     it "from database" do
       load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 1},
-        [:loaded_data_obj_content, {attributes: [:name, :price], limit: 1}]
+        [:loaded_data_obj_content,
+          {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
     end
 
     context "raises errors" do
@@ -222,7 +226,7 @@ describe "DataObjects" do
         .with(:list, {}).and_return "attributes of group list"
       pipe.should_receive(:get).with(
         :loaded_data_obj_content,
-        {:limit => 5, :attributes => "attributes of group list"}
+        {:limit => 5, :attributes => "attributes of group list", data_obj_name: "DataObjects"}
       ).and_return "content got by pipe"
       loaded_data.should_receive(:put).with "DataObjects", "content got by pipe"
 
@@ -237,7 +241,8 @@ describe "DataObjects" do
     
     it "presents update interface" do
       load_with_args :load_from_db, data_objects, {attribute_group: :for_update, limit: 1},
-        [:loaded_data_obj_content, {attributes: [:name, :category_id, :price], limit: 1}]
+        [:loaded_data_obj_content,
+          {attributes: [:name, :category_id, :price], limit: 1, data_obj_name: "DataObjects"}]
 
       loaded_data.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html_for_update, data_by_type: "loaded data to hash")

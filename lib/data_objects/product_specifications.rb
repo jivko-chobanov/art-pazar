@@ -1,6 +1,8 @@
 module Main
   class ProductSpecifications < DataObjects
     class Type
+      attr_reader :product_type
+
       def initialize(product_type)
         @data = {
           paintings: {
@@ -8,9 +10,10 @@ module Main
               list: [:artist, :year],
               for_visitor: [:artist, :year, :paint, :frames],
               for_create: [:artist, :year, :paint, :frames],
-              for_update: [:artist, :year, :paint, :frames],
+              for_update: [:id, :artist, :year, :paint, :frames],
             },
             attribute_names_by_instance_attribute_name: {
+              id: :id,
               year: :smallint_1,
               artist: :string_1,
               paint: :string_2,
@@ -56,6 +59,16 @@ module Main
       @attribute_groups = AttributeGroups.new @type.attribute_groups_definitions
     end
 
+    def load_from_db(needs)
+      self.type = needs[:type]
+      super
+    end
+
+    def load_from_params(needs)
+      self.type = needs[:type]
+      super
+    end
+
     def initialize(pipe = nil)
       super self.class, "PrS", pipe
     end
@@ -84,6 +97,10 @@ module Main
       end
 
       super(attributes)
+    end
+
+    def type
+      @type.product_type
     end
 
     private
