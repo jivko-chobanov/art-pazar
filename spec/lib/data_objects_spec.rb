@@ -1,6 +1,6 @@
 describe "DataObjects" do
   let(:data_object_attribute_groups) { double put: nil }
-  let(:table) { double }
+  let(:runtime_table) { double }
   let(:pipe) { double }
   subject(:data_objects) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
@@ -12,7 +12,7 @@ describe "DataObjects" do
 
     data_objects.instance_variable_set :@attribute_groups, data_object_attribute_groups
     data_objects.instance_variable_set :@pipe, pipe
-    data_objects.instance_variable_set :@table, table
+    data_objects.instance_variable_set :@runtime_table, runtime_table
     data_objects
   end
 
@@ -21,20 +21,19 @@ describe "DataObjects" do
       .and_return expected_args_for_pipe[1][:attributes]
     pipe.should_receive(:get).with(*expected_args_for_pipe)
       .and_return "content got by pipe"
-    table.should_receive(:put).with "DataObjects", "content got by pipe"
+    runtime_table.should_receive(:put).with "DataObjects", "content got by pipe"
   end
 
   def prep_load_from_params(data_objects, args_for_load, expected_args_for_pipe)
     DataObjects.send(:define_method, :class_abbreviation) { "Pr" }
-    data_object_attribute_groups.stub(:attributes_of).with(args_for_load[:attribute_group], {})
-      .and_return expected_args_for_pipe[1][:names]
-    Support.should_receive(:add_suffix).with(expected_args_for_pipe[1][:names], "_Pr")
+    data_object_attribute_groups.stub(:attributes_of)
+      .with(args_for_load[:attribute_group], {suffix_to_be_added: "_Pr"})
       .and_return expected_args_for_pipe[1][:names]
     pipe.should_receive(:get).with(*expected_args_for_pipe)
       .and_return "content got by pipe"
     Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
       .and_return "content got by pipe"
-    table.should_receive(:put).with "DataObjects", "content got by pipe"
+    runtime_table.should_receive(:put).with "DataObjects", "content got by pipe"
   end
 
   def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
@@ -54,12 +53,12 @@ describe "DataObjects" do
 
   before do
     stub_const "AttributeGroups", Class.new
-    stub_const "Table", Class.new
+    stub_const "RuntimeTable", Class.new
     stub_const "Pipe", Class.new
     stub_const "Products", Class.new
     stub_const "Support", Class.new
 
-    Table.stub(:new) { table }
+    RuntimeTable.stub(:new) { runtime_table }
     Pipe.stub(:new) { pipe }
   end
 
@@ -78,7 +77,7 @@ describe "DataObjects" do
 
     data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
       .and_return "attributes for create"
-    expect(data_objects.table_hash_for_create).to eq(
+    expect(data_objects.runtime_table_hash_for_create).to eq(
       "DataObjects" => ["attributes for create"]
     )
 
@@ -87,14 +86,14 @@ describe "DataObjects" do
   end
 
   it "gives loaded data as hash" do
-    expect { data_objects.table_hash }.to raise_error RuntimeError
+    expect { data_objects.runtime_table_hash }.to raise_error RuntimeError
 
     load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 2},
-      [:table_obj_content,
+      [:runtime_table_obj_content,
         {attributes: [:name, :price], limit: 2, data_obj_name: "DataObjects"}]
 
-    table.stub(:to_hash).and_return "content got by pipe to hash"
-    expect(data_objects.table_hash).to eq "content got by pipe to hash"
+    runtime_table.stub(:to_hash).and_return "content got by pipe to hash"
+    expect(data_objects.runtime_table_hash).to eq "content got by pipe to hash"
   end
 
   it "gives information about data" do
@@ -105,18 +104,18 @@ describe "DataObjects" do
     expect(empty_data_objects.loaded?).to be_false
 
     load_with_args :load_from_db, empty_data_objects, {attribute_group: :list, limit: 0},
-      [:table_obj_content,
+      [:runtime_table_obj_content,
         {attributes: [:name, :price], limit: 0, data_obj_name: "DataObjects"}]
 
-    table.stub(:empty?).and_return true
+    runtime_table.stub(:empty?).and_return true
     expect(empty_data_objects.loaded?).to be_true
     expect(empty_data_objects.loaded_empty_result?).to be_true
 
     not_empty_data_objects = new_data_objects
     load_with_args :load_from_db, not_empty_data_objects, {attribute_group: :list, limit: 1},
-      [:table_obj_content,
+      [:runtime_table_obj_content,
         {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
-    table.stub(:empty?).and_return false
+    runtime_table.stub(:empty?).and_return false
     expect(not_empty_data_objects.loaded_empty_result?).to be_false
   end
   
@@ -129,7 +128,7 @@ describe "DataObjects" do
 
     it "from database" do
       load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 1},
-        [:table_obj_content,
+        [:runtime_table_obj_content,
           {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
     end
 
@@ -158,18 +157,18 @@ describe "DataObjects" do
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      table.should_receive(:merge_to).with "DataObjects", id: 24
+      runtime_table.should_receive(:merge_to).with "DataObjects", id: 24
       expect(new_data_objects.create attributes).to be_true
     end
 
     it "from loaded data" do
       attributes = {name: "new name", price: 3.10}
-      table.stub(:get).with("DataObjects").and_return attributes
+      runtime_table.stub(:get).with("DataObjects").and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      table.should_receive(:merge_to).with "DataObjects", id: 24
+      runtime_table.should_receive(:merge_to).with "DataObjects", id: 24
       expect(new_data_objects.create).to be_true
     end
 
@@ -177,12 +176,12 @@ describe "DataObjects" do
       attributes = {name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_create},
         [:params, {names: attributes.keys}]
-      table.should_receive(:get).with("DataObjects").and_return attributes
+      runtime_table.should_receive(:get).with("DataObjects").and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      table.should_receive(:merge_to).with "DataObjects", id: 24
+      runtime_table.should_receive(:merge_to).with "DataObjects", id: 24
       expect(new_data_objects.load_and_create).to be_true
     end
   end
@@ -199,7 +198,7 @@ describe "DataObjects" do
 
     it "from loaded data" do
       attributes = {id: 14, name: "new name", price: 3.10}
-      table.stub(:get).with("DataObjects").and_return attributes
+      runtime_table.stub(:get).with("DataObjects").and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -210,7 +209,7 @@ describe "DataObjects" do
       attributes = {id: 18, name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_update},
         [:params, {names: attributes.keys}]
-      table.should_receive(:get).with("DataObjects").and_return attributes
+      runtime_table.should_receive(:get).with("DataObjects").and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -226,14 +225,14 @@ describe "DataObjects" do
       data_object_attribute_groups.stub(:attributes_of)
         .with(:list, {}).and_return "attributes of group list"
       pipe.should_receive(:get).with(
-        :table_obj_content,
+        :runtime_table_obj_content,
         {:limit => 5, :attributes => "attributes of group list", data_obj_name: "DataObjects"}
       ).and_return "content got by pipe"
-      table.should_receive(:put).with "DataObjects", "content got by pipe"
+      runtime_table.should_receive(:put).with "DataObjects", "content got by pipe"
 
       data_objects.load_from_db attribute_group: :list, limit: 5
 
-      table.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html, data_by_type: "loaded data to hash")
         .and_return "html got by pipe"
 
@@ -242,10 +241,10 @@ describe "DataObjects" do
     
     it "presents update interface" do
       load_with_args :load_from_db, data_objects, {attribute_group: :for_update, limit: 1},
-        [:table_obj_content,
+        [:runtime_table_obj_content,
           {attributes: [:name, :category_id, :price], limit: 1, data_obj_name: "DataObjects"}]
 
-      table.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hash).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html_for_update, data_by_type: "loaded data to hash")
         .and_return "html got by pipe"
       expect(data_objects.html_for_update).to eq "html got by pipe"

@@ -15,8 +15,8 @@ describe "ProductShowPage" do
   end
 
   def html_prepare_fakes
-    product.stub(:table_hash).and_return "Products" => "data1"
-    product_specifications.stub(:table_hash).and_return "Specifications" => "data2"
+    product.stub(:runtime_table_hash).and_return "Products" => "data1"
+    product_specifications.stub(:runtime_table_hash).and_return "Specifications" => "data2"
     pipe.stub(:get).with(:html, data_by_type: {
       "Products" => "data1",
       "Specifications" => "data2"

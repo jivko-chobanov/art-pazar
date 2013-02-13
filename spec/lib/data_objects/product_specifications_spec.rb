@@ -1,6 +1,6 @@
 describe "Main::ProductSpecifications" do
   let(:product_attribute_groups) { double put: nil }
-  let(:table) { double }
+  let(:runtime_table) { double }
   subject(:product_specifications) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
     Main::ProductSpecifications.new
@@ -9,7 +9,7 @@ describe "Main::ProductSpecifications" do
   before do
     stub_const "DataObjects", Class.new
     stub_const "AttributeGroups", Class.new
-    stub_const "Table", Class.new
+    stub_const "RuntimeTable", Class.new
     stub_const "Pipe", Class.new
 
     AttributeGroups.stub(:new).with(kind_of Hash) { product_attribute_groups }
@@ -79,8 +79,8 @@ describe "Main::ProductSpecifications" do
     it "if product_id then first adds it to loaded data" do
       product_specifications.should_receive(:data_obj_name).with(no_args())
         .and_return :the_data_obj_name
-      product_specifications.instance_variable_set :@table, table
-      table.should_receive(:merge_to).with :the_data_obj_name, product_id: 12
+      product_specifications.instance_variable_set :@runtime_table, runtime_table
+      runtime_table.should_receive(:merge_to).with :the_data_obj_name, product_id: 12
       expect(product_specifications.create 12).to eq "true from super with args: "
     end
   end

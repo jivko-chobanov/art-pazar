@@ -1,6 +1,6 @@
 describe "Main::Products" do
   let(:product_attribute_groups) { double put: nil }
-  let(:table) { double }
+  let(:runtime_table) { double }
   subject(:products) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
     Main::Products.new
@@ -9,7 +9,7 @@ describe "Main::Products" do
   before do
     stub_const "DataObjects", Class.new
     stub_const "AttributeGroups", Class.new
-    stub_const "Table", Class.new
+    stub_const "RuntimeTable", Class.new
     stub_const "Pipe", Class.new
 
     AttributeGroups.should_receive(:new).with(kind_of Hash) { product_attribute_groups }
@@ -28,20 +28,20 @@ describe "Main::Products" do
 
     context "when ok" do
       it "gives id" do
-        products.instance_variable_set :@table, table
+        products.instance_variable_set :@runtime_table, runtime_table
 
         products.should_receive(:data_obj_name).at_least(:once).with(no_args()).and_return :the_data_obj_name
-        table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return id: 12, name: "any"
+        runtime_table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return id: 12, name: "any"
         expect(products.id).to eq 12
       end
     end
 
     context "when wrong" do
       it "raises error on #id" do
-        products.instance_variable_set :@table, table
+        products.instance_variable_set :@runtime_table, runtime_table
 
         products.should_receive(:data_obj_name).at_least(:once).with(no_args()).and_return :the_data_obj_name
-        table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return name: "any"
+        runtime_table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return name: "any"
         expect { products.id }.to raise_error RuntimeError
       end
     end

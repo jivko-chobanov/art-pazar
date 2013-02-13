@@ -1,68 +1,60 @@
 class DataObjects
   def initialize(pipe = nil)
-    @table = Table.new
+    @runtime_table = RuntimeTable.new
     @is_loaded = false
     pipe ? @pipe = pipe : @pipe = Pipe.new
   end
 
   def load_from_params(needs)
-    unless needs.include? :attribute_group
-      raise "Load from params must have in its needs :attribute_group"
-    end
-
-    @is_loaded = true
+    prepare_loading(needs)
 
     suffix = "_" + class_abbreviation
 
-    needs[:names] = Support.add_suffix attributes_of(needs[:attribute_group]), suffix
+    needs[:names] = attributes_of needs[:attribute_group], suffix_to_be_added: suffix
     needs.delete :attribute_group
 
-    @table.put data_obj_name, Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix)
+    put_to_runtime_table Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix)
   end
 
   def load_from_db(needs)
-    unless needs.include? :attribute_group
-      raise "Load from db must have in its needs :attribute_group"
-    end
-
-    @is_loaded = true
+    prepare_loading(needs)
 
     needs[:attributes] = attributes_of needs[:attribute_group]
     needs.delete :attribute_group
 
     needs[:data_obj_name] = data_obj_name
 
-    @table.put data_obj_name, @pipe.get(:table_obj_content, needs)
+    put_to_runtime_table @pipe.get(:runtime_table_obj_content, needs)
   end
 
-  def table_hash
-    if_loaded_then do
-      @table.to_hash
+  def runtime_table_hash
+    must_be_loaded_then do
+      @runtime_table.to_hash
     end
   end
 
   def html
-    if_loaded_then do
-      @pipe.get :html, data_by_type: @table.to_hash
+    must_be_loaded_then do
+      @pipe.get :html, data_by_type: @runtime_table.to_hash
     end
   end
 
   def html_for_update
-    if_loaded_then do
-      @pipe.get :html_for_update, data_by_type: @table.to_hash
+    must_be_loaded_then do
+      @pipe.get :html_for_update, data_by_type: @runtime_table.to_hash
     end
   end
 
-  def table_hash_for_update
-    table_hash
+  def runtime_table_hash_for_update
+    runtime_table_hash
   end
 
-  def table_hash_for_create
+  def runtime_table_hash_for_create
     {data_obj_name => [attributes_of(:for_create)]}
   end
 
   def html_for_create
-    @pipe.get :html_for_create, data_by_type: table_hash_for_create
+    @pipe.get :html_for_create, data_by_type: runtime_table_hash_for_create
   end
 
   def loaded?
@@ -71,7 +63,7 @@ class DataObjects
 
   def loaded_empty_result?
     if loaded?
-      @table.empty?
+      @runtime_table.empty?
     else
       raise "Not tried to load yet."
     end
@@ -83,8 +75,8 @@ class DataObjects
 
   def create(attributes = nil)
     attributes = prepare_and_check_attributes_for_create attributes
-    success = put attributes
-    @table.merge_to(data_obj_name, {id:
+    success = put_to_pipe attributes
+    @runtime_table.merge_to(data_obj_name, {id:
       @pipe.get(:last_created_id, data_obj_name: data_obj_name)
     })
     success
@@ -97,7 +89,7 @@ class DataObjects
 
   def update(attributes = nil)
     attributes = prepare_and_check_attributes_for_update attributes
-    put attributes
+    put_to_pipe attributes
   end
 
   def load_and_update
@@ -111,8 +103,16 @@ class DataObjects
 
   private
 
+  def prepare_loading(needs)
+    unless needs.include? :attribute_group
+      raise "Loading must have in its needs :attribute_group"
+    end
+
+    @is_loaded = true
+  end
+
   def prepare_and_check_attributes_for_update(attributes)
-    if attributes.nil? then attributes = @table.get data_obj_name end
+    if attributes.nil? then attributes = @runtime_table.get data_obj_name end
     unless attributes.include? :id
       raise "Cannot update without an id"
     end
@@ -120,7 +120,7 @@ class DataObjects
   end
 
   def prepare_and_check_attributes_for_create(attributes)
-    if attributes.nil? then attributes = @table.get data_obj_name end
+    if attributes.nil? then attributes = @runtime_table.get data_obj_name end
     if attributes.include? :id
       raise "Cannot create with an id"
     end
@@ -132,11 +132,19 @@ class DataObjects
     attributes
   end
 
-  def put(attributes)
+  def put_to_pipe(attributes)
     @pipe.put data_obj_name, attributes
   end
 
-  def if_loaded_then
+  def put_to_runtime_table(rows_or_hash_to_the_row)
+    if rows_or_hash_to_the_row.is_a? Array
+      @runtime_table.put_rows rows_or_hash_to_the_row
+    else
+      @runtime_table.put_columns_to_the_row rows_or_hash_to_the_row
+    end
+  end
+
+  def must_be_loaded_then
     if loaded?
       yield
     else
