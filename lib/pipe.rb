@@ -46,7 +46,7 @@ class Pipe
     @needs_and_input = needs_and_input
     
     case what
-      when :loaded_data_obj_content
+      when :table_obj_content
         get_data
       when :html
         get_html

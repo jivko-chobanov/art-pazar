@@ -93,7 +93,7 @@ module Main
       end
 
       unless product_id.nil?
-        @loaded_data.merge_to(data_obj_name, product_id: product_id)
+        @table.merge_to(data_obj_name, product_id: product_id)
       end
 
       super(attributes)

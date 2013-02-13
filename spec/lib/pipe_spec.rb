@@ -16,11 +16,11 @@ describe "Pipe" do
 
   context "when undefined command" do
     it "raises exceptions" do
-      expect { pipe.get :loaded_data_obj_content, 1 }.to raise_error RuntimeError
-      expect { pipe.get :loaded_data_obj_content, qqqq: 4 }.to raise_error RuntimeError
-      expect { pipe.get :loaded_data_obj_content, data_obj_name: "Products" }
+      expect { pipe.get :table_obj_content, 1 }.to raise_error RuntimeError
+      expect { pipe.get :table_obj_content, qqqq: 4 }.to raise_error RuntimeError
+      expect { pipe.get :table_obj_content, data_obj_name: "Products" }
         .to raise_error Pipe::MissingNeedOrInputError
-      expect { pipe.get :loaded_data_obj_content, data_obj_name: "Qqq" }
+      expect { pipe.get :table_obj_content, data_obj_name: "Qqq" }
         .to raise_error RuntimeError
       expect { pipe.get :html, qqq: 4 }
         .to raise_error Pipe::MissingNeedOrInputError
@@ -28,7 +28,7 @@ describe "Pipe" do
   end
 
   it "gets the data for data object" do
-    three_products_for_listing = pipe.get(:loaded_data_obj_content, {
+    three_products_for_listing = pipe.get(:table_obj_content, {
       data_obj_name: "Products",
       attributes: [:name, :price],
       limit: 3

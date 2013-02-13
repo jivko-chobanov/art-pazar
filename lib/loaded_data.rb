@@ -1,4 +1,4 @@
-class LoadedData
+class Table
   include Enumerable
 
   def initialize

@@ -12,8 +12,8 @@ module Main
 
     def id
       if loaded?
-        if @loaded_data.get(data_obj_name).include? :id
-          @loaded_data.get(data_obj_name)[:id]
+        if @table.get(data_obj_name).include? :id
+          @table.get(data_obj_name)[:id]
         else
           raise "Loaded_data loaded, but does not have :id"
         end

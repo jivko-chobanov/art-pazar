@@ -1,6 +1,6 @@
 class DataObjects
   def initialize(child_class, child_class_unique_abbreviation, pipe = nil)
-    @loaded_data = LoadedData.new
+    @table = Table.new
     @is_loaded = false
     pipe ? @pipe = pipe : @pipe = Pipe.new
     @child_class, @child_class_unique_abbreviation = child_class, child_class_unique_abbreviation
@@ -18,7 +18,7 @@ class DataObjects
     needs[:names] = Support.add_suffix attributes_of(needs[:attribute_group]), suffix
     needs.delete :attribute_group
 
-    @loaded_data.put data_obj_name, Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix)
+    @table.put data_obj_name, Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix)
   end
 
   def load_from_db(needs)
@@ -33,37 +33,37 @@ class DataObjects
 
     needs[:data_obj_name] = data_obj_name
 
-    @loaded_data.put data_obj_name, @pipe.get(:loaded_data_obj_content, needs)
+    @table.put data_obj_name, @pipe.get(:table_obj_content, needs)
   end
 
-  def loaded_data_hash
+  def table_hash
     if_loaded_then do
-      @loaded_data.to_hash
+      @table.to_hash
     end
   end
 
   def html
     if_loaded_then do
-      @pipe.get :html, data_by_type: @loaded_data.to_hash
+      @pipe.get :html, data_by_type: @table.to_hash
     end
   end
 
   def html_for_update
     if_loaded_then do
-      @pipe.get :html_for_update, data_by_type: @loaded_data.to_hash
+      @pipe.get :html_for_update, data_by_type: @table.to_hash
     end
   end
 
-  def loaded_data_hash_for_update
-    loaded_data_hash
+  def table_hash_for_update
+    table_hash
   end
 
-  def loaded_data_hash_for_create
+  def table_hash_for_create
     {data_obj_name => [attributes_of(:for_create)]}
   end
 
   def html_for_create
-    @pipe.get :html_for_create, data_by_type: loaded_data_hash_for_create
+    @pipe.get :html_for_create, data_by_type: table_hash_for_create
   end
 
   def loaded?
@@ -72,7 +72,7 @@ class DataObjects
 
   def loaded_empty_result?
     if loaded?
-      @loaded_data.empty?
+      @table.empty?
     else
       raise "Not tried to load yet."
     end
@@ -85,7 +85,7 @@ class DataObjects
   def create(attributes = nil)
     attributes = prepare_and_check_attributes_for_create attributes
     success = put attributes
-    @loaded_data.merge_to(data_obj_name, {id:
+    @table.merge_to(data_obj_name, {id:
       @pipe.get(:last_created_id, data_obj_name: data_obj_name)
     })
     success
@@ -113,7 +113,7 @@ class DataObjects
   private
 
   def prepare_and_check_attributes_for_update(attributes)
-    if attributes.nil? then attributes = @loaded_data.get data_obj_name end
+    if attributes.nil? then attributes = @table.get data_obj_name end
     unless attributes.include? :id
       raise "Cannot update without an id"
     end
@@ -121,7 +121,7 @@ class DataObjects
   end
 
   def prepare_and_check_attributes_for_create(attributes)
-    if attributes.nil? then attributes = @loaded_data.get data_obj_name end
+    if attributes.nil? then attributes = @table.get data_obj_name end
     if attributes.include? :id
       raise "Cannot create with an id"
     end
