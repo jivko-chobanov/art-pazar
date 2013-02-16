@@ -20,8 +20,8 @@ class ProductShowPage < ShowPage
   def html
     super do
       @pipe.get(:html, data_by_type: {
-        @product.data_obj_name => @product.runtime_table_hashes,
-        @product_specifications.data_obj_name => @product_specifications.runtime_table_hashes
+        @product.data_obj_name => @product.loaded_as_hashes,
+        @product_specifications.data_obj_name => @product_specifications.loaded_as_hashes
       })
     end
   end
