@@ -20,11 +20,13 @@ describe "ProductCreatePage" do
   end
 
   def html_prepare_fakes
-    product.stub(:runtime_table_hash_for_create).and_return "Products" => "data1"
-    product_specifications.stub(:runtime_table_hash_for_create).and_return "Specifications" => "data2"
+    product.stub(:attributes_of).and_return ["attribute names 1"]
+    product_specifications.stub(:attributes_of).and_return ["attribute names 2"]
+    product.stub(:data_obj_name).and_return "Products"
+    product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
     pipe.stub(:get).with(:html_for_create, data_by_type: {
-      "Products" => "data1",
-      "Specifications" => "data2"
+      "Products" => ["attribute names 1"],
+      "ProductSpecifications" => ["attribute names 2"]
     }).and_return "HTML for create product page"
   end
 

@@ -26,9 +26,10 @@ class ProductCreatePage < UpdateOrCreatePage
 
   def html
     super do
-      @pipe.get :html_for_create, data_by_type: @product.runtime_table_hash_for_create.merge(
-        @product_specifications.runtime_table_hash_for_create
-      )
+      @pipe.get(:html_for_create, data_by_type: {
+        @product.data_obj_name => @product.attributes_of(:for_create),
+        @product_specifications.data_obj_name => @product_specifications.attributes_of(:for_create)
+      })
     end
   end
 

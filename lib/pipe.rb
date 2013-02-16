@@ -46,7 +46,7 @@ class Pipe
     @needs_and_input = needs_and_input
     
     case what
-      when :runtime_table_obj_content
+      when :runtime_table_hashes
         get_data
       when :html
         get_html
@@ -136,7 +136,7 @@ class Pipe
 
       @needs_and_input[:data_by_type].each do |data_obj_name, item_of_system_names_of_fields|
         html << data_obj_name.to_s << ":\n"
-        html << item_of_system_names_of_fields.first.join(", ") << "\n"
+        html << item_of_system_names_of_fields.join(", ") << "\n"
       end
     end
     html

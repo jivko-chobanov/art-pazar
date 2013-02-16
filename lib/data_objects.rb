@@ -24,37 +24,29 @@ class DataObjects
 
     needs[:data_obj_name] = data_obj_name
 
-    put_to_runtime_table @pipe.get(:runtime_table_obj_content, needs)
+    put_to_runtime_table @pipe.get(:runtime_table_hashes, needs)
   end
 
-  def runtime_table_hash
+  def runtime_table_hashes
     must_be_loaded_then do
-      @runtime_table.to_hash
+      @runtime_table.as_hashes
     end
   end
 
   def html
     must_be_loaded_then do
-      @pipe.get :html, data_by_type: @runtime_table.to_hash
+      @pipe.get :html, data_by_type: {data_obj_name => @runtime_table.as_hashes}
     end
   end
 
   def html_for_update
     must_be_loaded_then do
-      @pipe.get :html_for_update, data_by_type: @runtime_table.to_hash
+      @pipe.get :html_for_update, data_by_type: @runtime_table.as_hashes
     end
   end
 
-  def runtime_table_hash_for_update
-    runtime_table_hash
-  end
-
-  def runtime_table_hash_for_create
-    {data_obj_name => [attributes_of(:for_create)]}
-  end
-
   def html_for_create
-    @pipe.get :html_for_create, data_by_type: runtime_table_hash_for_create
+    @pipe.get :html_for_create, data_by_type: {data_obj_name => [attributes_of(:for_create)]}
   end
 
   def loaded?
@@ -76,9 +68,7 @@ class DataObjects
   def create(attributes = nil)
     attributes = prepare_and_check_attributes_for_create attributes
     success = put_to_pipe attributes
-    @runtime_table.merge_to(data_obj_name, {id:
-      @pipe.get(:last_created_id, data_obj_name: data_obj_name)
-    })
+    @runtime_table.row << {id: @pipe.get(:last_created_id, data_obj_name: data_obj_name)}
     success
   end
 
@@ -112,7 +102,7 @@ class DataObjects
   end
 
   def prepare_and_check_attributes_for_update(attributes)
-    if attributes.nil? then attributes = @runtime_table.get data_obj_name end
+    if attributes.nil? then attributes = @runtime_table.row.as_hash end
     unless attributes.include? :id
       raise "Cannot update without an id"
     end
@@ -120,7 +110,7 @@ class DataObjects
   end
 
   def prepare_and_check_attributes_for_create(attributes)
-    if attributes.nil? then attributes = @runtime_table.get data_obj_name end
+    if attributes.nil? then attributes = @runtime_table.row.as_hash end
     if attributes.include? :id
       raise "Cannot create with an id"
     end
@@ -138,9 +128,9 @@ class DataObjects
 
   def put_to_runtime_table(rows_or_hash_to_the_row)
     if rows_or_hash_to_the_row.is_a? Array
-      @runtime_table.put_rows rows_or_hash_to_the_row
+      @runtime_table << rows_or_hash_to_the_row
     else
-      @runtime_table.put_columns_to_the_row rows_or_hash_to_the_row
+      @runtime_table.row << rows_or_hash_to_the_row
     end
   end
 

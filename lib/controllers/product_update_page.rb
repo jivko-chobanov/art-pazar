@@ -31,9 +31,10 @@ class ProductUpdatePage < UpdateOrCreatePage
 
   def html
     super do
-      @pipe.get :html_for_update, data_by_type: @product.runtime_table_hash_for_update.merge(
-        @product_specifications.runtime_table_hash_for_update
-      )
+      @pipe.get(:html_for_update, data_by_type: {
+        @product.data_obj_name => @product.runtime_table_hashes,
+        @product_specifications.data_obj_name => @product_specifications.runtime_table_hashes
+      })
     end
   end
 

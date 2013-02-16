@@ -1,6 +1,7 @@
 describe "Main::Products" do
   let(:product_attribute_groups) { double put: nil }
   let(:runtime_table) { double }
+  let(:row) { double }
   subject(:products) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
     Main::Products.new
@@ -30,8 +31,9 @@ describe "Main::Products" do
       it "gives id" do
         products.instance_variable_set :@runtime_table, runtime_table
 
-        products.should_receive(:data_obj_name).at_least(:once).with(no_args()).and_return :the_data_obj_name
-        runtime_table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return id: 12, name: "any"
+        runtime_table.should_receive(:row).at_least(:once).and_return row
+        row.should_receive(:respond_to?).at_least(:once).with(:id).and_return true
+        row.should_receive(:id).at_least(:once).with(no_args()).and_return 12
         expect(products.id).to eq 12
       end
     end
@@ -40,8 +42,8 @@ describe "Main::Products" do
       it "raises error on #id" do
         products.instance_variable_set :@runtime_table, runtime_table
 
-        products.should_receive(:data_obj_name).at_least(:once).with(no_args()).and_return :the_data_obj_name
-        runtime_table.should_receive(:get).at_least(:once).with(:the_data_obj_name).and_return name: "any"
+        runtime_table.should_receive(:row).at_least(:once).and_return row
+        row.should_receive(:respond_to?).at_least(:once).with(:id).and_return false
         expect { products.id }.to raise_error RuntimeError
       end
     end

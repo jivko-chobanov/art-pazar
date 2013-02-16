@@ -1,6 +1,7 @@
 describe "Main::ProductSpecifications" do
   let(:product_attribute_groups) { double put: nil }
   let(:runtime_table) { double }
+  let(:row) { double }
   subject(:product_specifications) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
     Main::ProductSpecifications.new
@@ -77,10 +78,9 @@ describe "Main::ProductSpecifications" do
     end
 
     it "if product_id then first adds it to loaded data" do
-      product_specifications.should_receive(:data_obj_name).with(no_args())
-        .and_return :the_data_obj_name
       product_specifications.instance_variable_set :@runtime_table, runtime_table
-      runtime_table.should_receive(:merge_to).with :the_data_obj_name, product_id: 12
+      runtime_table.should_receive(:row).with(no_args()).and_return row
+      row.should_receive(:<<).with product_id: 12
       expect(product_specifications.create 12).to eq "true from super with args: "
     end
   end

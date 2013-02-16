@@ -15,7 +15,7 @@ describe "RuntimeTable" do
     stub_const "Support", Class.new
   end
   
-  context "when single row" do
+  context "Row" do
     it "adds named values on initialization and gives values" do
       expect(johns_row.name).to eq "John"
       expect(johns_row.age).to eq 22
@@ -28,7 +28,7 @@ describe "RuntimeTable" do
     end
 
     it "gives column names" do
-      expect(johns_row.columns).to eq [:name, :age]
+      expect(johns_row.column_names).to eq [:name, :age]
     end
 
     it "#respond_to?" do
@@ -36,12 +36,28 @@ describe "RuntimeTable" do
       expect(johns_row.respond_to? :qqq).to be_false
     end
 
-    it "gives cells_by_column" do
-      expect(johns_row.cells_by_column).to eq name: "John", age: 22
+    it "gives cells by column" do
+      expect(johns_row.as_hash).to eq name: "John", age: 22
     end
   end
 
-  context "when multiple rows" do
+  context "Table" do
+    context "can access the only row" do
+      it "if 1 row" do
+        single_row_table = RuntimeTable.new [{name: "John", age: 22}]
+        expect(single_row_table.row).to be_a RuntimeTable::Row
+      end
+
+      it "if 0 rows creates empty Row" do
+        zero_rows_table = RuntimeTable.new
+        expect(zero_rows_table.row.as_hash).to eq({})
+      end
+
+      it "if many rows" do
+        expect { people_s_table.row }.to raise_error RuntimeError
+      end
+    end
+
     it "is enumerable" do
       expect(people_s_table.map(&:name)).to eq ["John", "Ana"]
     end

@@ -83,9 +83,9 @@ module Main
       end
     end
 
-    def attributes_of attribute_group
+    def attributes_of(attribute_group, options = {})
       if type_set?
-        super attribute_group
+        super
       end
     end
 
@@ -97,7 +97,7 @@ module Main
       end
 
       unless product_id.nil?
-        @runtime_table.merge_to(data_obj_name, product_id: product_id)
+        @runtime_table.row << {product_id: product_id}
       end
 
       super(attributes)

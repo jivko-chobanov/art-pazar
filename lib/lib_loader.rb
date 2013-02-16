@@ -6,7 +6,7 @@ class LibPaths
     @relative_paths = [ 'pipe',
                         'support',
                         'attribute_groups',
-                        'loaded_data',
+                        'runtime_table',
                         'data_objects',
                         'pages/page',
                         'pages/show_page',

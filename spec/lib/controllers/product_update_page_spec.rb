@@ -21,11 +21,13 @@ describe "ProductUpdatePage" do
   end
 
   def html_prepare_fakes
-    product.stub(:runtime_table_hash_for_update).and_return "Products" => "data1"
-    product_specifications.stub(:runtime_table_hash_for_update).and_return "Specifications" => "data2"
+    product.stub(:runtime_table_hashes).and_return ["data1"]
+    product_specifications.stub(:runtime_table_hashes).and_return ["data2"]
+    product.stub(:data_obj_name).and_return "Products"
+    product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
     pipe.stub(:get).with(:html_for_update, data_by_type: {
-      "Products" => "data1",
-      "Specifications" => "data2"
+      "Products" => ["data1"],
+      "ProductSpecifications" => ["data2"]
     }).and_return "HTML for update product page"
   end
 

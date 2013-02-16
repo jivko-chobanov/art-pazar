@@ -19,8 +19,10 @@ class ProductShowPage < ShowPage
 
   def html
     super do
-      @pipe.get :html, data_by_type:
-        @product.runtime_table_hash.merge(@product_specifications.runtime_table_hash)
+      @pipe.get(:html, data_by_type: {
+        @product.data_obj_name => @product.runtime_table_hashes,
+        @product_specifications.data_obj_name => @product_specifications.runtime_table_hashes
+      })
     end
   end
 
