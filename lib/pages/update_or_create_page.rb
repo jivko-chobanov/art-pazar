@@ -1,2 +1,0 @@
-class UpdateOrCreatePage < Page
-end

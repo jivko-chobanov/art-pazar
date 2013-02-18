@@ -1,15 +1,6 @@
-class Page
+class Page < Action
   def initialize
-    @is_loaded = false
-  end
-
-  def load
-    unless loaded?
-      @is_loaded = true
-      yield if block_given?
-    else
-      raise "cannot load page twice"
-    end
+    super
   end
 
   def html
@@ -25,22 +16,5 @@ class Page
   def load_and_get_html
     load
     html
-  end
-
-  def accomplish
-    if loaded?
-      yield
-    else
-      raise "load first"
-    end
-  end
-
-  def load_and_accomplish(&to_accomplish)
-    load
-    accomplish &to_accomplish
-  end
-
-  def loaded?
-    @is_loaded
   end
 end

@@ -1,4 +1,4 @@
-class Home < ShowPage
+class ProductListPage < Page
 
   def initialize
     @products = Main::Products.new

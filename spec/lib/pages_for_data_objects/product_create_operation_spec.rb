@@ -1,10 +1,10 @@
-describe "ProductCreatePage" do
+describe "ProductCreateOperation" do
   let(:product) { double }
   let(:product_specifications) { double }
   let(:pipe) { double }
   subject(:product_create_page) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-    ProductCreatePage.new
+    ProductCreateOperation.new
   end
 
   def load_from_params_prepare_fakes(type)
@@ -37,7 +37,7 @@ describe "ProductCreatePage" do
   end
 
   before do
-    stub_const "UpdateOrCreatePage", Class.new
+    stub_const "Operation", Class.new
     stub_const "Main", Module.new
     stub_const "Main::Products", Class.new
     stub_const "Main::ProductSpecifications", Class.new
@@ -46,37 +46,18 @@ describe "ProductCreatePage" do
     Main::Products.stub(:new).and_return product
     Main::ProductSpecifications.stub(:new).and_return product_specifications
     Pipe.stub(:new) { pipe }
-    UpdateOrCreatePage.send(:define_method, :load) { |&block| block.call }
-    UpdateOrCreatePage.send(:define_method, :html) { |&block| block.call }
-    UpdateOrCreatePage.send(:define_method, :accomplish) { |&block| block.call }
+    Operation.send(:define_method, :load) { |&block| block.call }
+    Operation.send(:define_method, :accomplish) { |&block| block.call }
   end
 
   it "gets pipe" do
     expect(product_create_page.pipe).to eq pipe
   end
 
-  context "loads product and makes create fields html" do
-    it "in two steps" do
-      load_from_args_prepare_fakes :paintings
-      product_create_page.load :from_args, :paintings
-
-      expect(product_create_page.pipe_name_of_txt_if_empty_content).to eq false
-
-      html_prepare_fakes
-      expect(product_create_page.html).to eq "HTML for create product page"
-    end
-
-    it "in one step" do
-      load_from_args_prepare_fakes :paintings
-      html_prepare_fakes
-      expect(product_create_page.load_and_get_html :paintings).to eq "HTML for create product page"
-    end
-  end
-
   context "creates product and its specification" do
     it "in two steps" do
       load_from_params_prepare_fakes :paintings
-      product_create_page.load :from_params, :paintings
+      product_create_page.load :paintings
 
       accomplish_prepare_fakes
       expect(product_create_page.accomplish).to be_true

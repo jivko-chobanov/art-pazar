@@ -1,4 +1,4 @@
-class ProductShowPage < ShowPage
+class ProductDetailsPage < Page
   def initialize
     @product = Main::Products.new
     @product_specifications = Main::ProductSpecifications.new
