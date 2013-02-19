@@ -18,7 +18,10 @@ class LibPaths
                         'pages_for_data_objects/product_blank_for_update_page',
                         'pages_for_data_objects/product_update_operation',
                         'pages_for_data_objects/product_blank_for_create_page',
-                        'pages_for_data_objects/product_create_operation']
+                        'pages_for_data_objects/product_create_operation',
+                        'data_objects/users',
+                        'controller',
+                      ]
     @absolute_paths = @relative_paths.map { |relative_path| @root_path + relative_path + ".rb" }
   end
 end
