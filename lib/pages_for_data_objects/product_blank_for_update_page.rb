@@ -32,8 +32,8 @@ class ProductBlankForUpdatePage < Page
     @product.loaded_empty_result? ? :no_product : false
   end
 
-  def load_and_get_html(id)
-    load id
+  def load_and_get_html(hash_with_id)
+    load hash_with_id[:id]
     html
   end
 end

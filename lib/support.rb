@@ -1,23 +1,21 @@
 class Support
   class << self
+    def to_camel_string(snake)
+      work_with_string(snake) do |snake_string|
+        snake_string.split('_').map(&:capitalize).join
+      end.to_s
+    end
+
     def add_suffix(array, suffix)
-      array.map do |value|
-        if value.is_a? Symbol
-          (value.to_s + suffix).to_sym
-        else
-          value + suffix
-        end
-      end
+      array.map { |value| work_with_string(value) { |string| string + suffix } }
     end
 
     def remove_suffix_from_keys(hash, suffix)
-      hash.each_with_object({}) do |(suffixed_key, value), unsuffixed_hash|
-        unsuffix = ->(word) { word.gsub(/#{suffix}$/, '') }
-        if suffixed_key.is_a? Symbol
-          unsuffixed_hash[unsuffix.(suffixed_key.to_s).to_sym] = value
-        else
-          unsuffixed_hash[unsuffix.(suffixed_key)] = value
+      hash.each_with_object({}) do |(suffixed_key, value), hash_with_unsuffixed_keys|
+        unsuffixed_key = work_with_string(suffixed_key) do |suffixed_string_key|
+          suffixed_string_key.gsub(/#{suffix}$/, '')
         end
+        hash_with_unsuffixed_keys[unsuffixed_key] = value
       end
     end
   end
@@ -31,6 +29,14 @@ class Support
     end
 
     private
+
+    def work_with_string(string_or_symbol)
+      if string_or_symbol.is_a? Symbol
+        (yield string_or_symbol.to_s).to_sym
+      else
+        yield string_or_symbol
+      end
+    end
 
     def without_cells_description(rows_with_cells_by_column_name)
       rows_with_cells_by_column_name.map { |cells_by_column_name| Hash[cells_by_column_name].values }

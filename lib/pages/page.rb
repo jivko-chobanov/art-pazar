@@ -13,7 +13,7 @@ class Page < Action
     end
   end
 
-  def load_and_get_html
+  def load_and_get_html(unused_arg = nil)
     load
     html
   end

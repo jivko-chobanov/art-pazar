@@ -66,7 +66,7 @@ describe "ProductCreateOperation" do
     it "in one step" do
       load_from_params_prepare_fakes :paintings
       accomplish_prepare_fakes
-      expect(product_create_page.load_and_accomplish :paintings).to be_true
+      expect(product_create_page.load_and_accomplish product_type: :paintings).to be_true
     end
   end
 end

@@ -11,7 +11,7 @@ class Operation < Action
     end
   end
 
-  def load_and_accomplish(&to_accomplish)
+  def load_and_accomplish(unused_arg = nil, &to_accomplish)
     load
     accomplish &to_accomplish
   end

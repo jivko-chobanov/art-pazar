@@ -3,6 +3,13 @@ describe "Support" do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
   end
 
+  it "#to_camel_string" do
+    expect(Support.to_camel_string "word").to eq "Word"
+    expect(Support.to_camel_string :word).to eq "Word"
+    expect(Support.to_camel_string "word_and_another").to eq "WordAndAnother"
+    expect(Support.to_camel_string :word_and_another).to eq "WordAndAnother"
+  end
+
   it "adds suffix to array" do
     expect(Support.add_suffix ["abc", "efg"], " is ok").to eq ["abc is ok", "efg is ok"]
     expect(Support.add_suffix [], " is ok").to eq []

@@ -34,7 +34,6 @@ describe "DataObjects" do
       .and_return "content got by pipe"
     Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
       .and_return "content got by pipe"
-    runtime_table.should_receive(:row).with(no_args()).and_return row
     row.should_receive(:<<).with "content got by pipe"
   end
 
@@ -62,6 +61,7 @@ describe "DataObjects" do
 
     RuntimeTable.stub(:new) { runtime_table }
     Pipe.stub(:new) { pipe }
+    runtime_table.stub(:row).with(no_args()).and_return row
   end
 
   it "initializes with given pipe" do
@@ -115,7 +115,7 @@ describe "DataObjects" do
     expect(not_empty_data_objects.loaded_empty_result?).to be_false
   end
   
-  context "when loading" do
+  context "loads" do
     it "from params" do
       load_with_args :load_from_params, data_objects,
         {attribute_group: :for_create},
@@ -139,6 +139,28 @@ describe "DataObjects" do
     end
   end
 
+  it "sets and gets attribute values" do
+    row.should_receive(:<<).with id: 5, name: "Jo"
+    data_objects.set id: 5, name: "Jo"
+
+    row.should_receive(:respond_to?).with(:id).and_return true
+    row.should_receive(:id).and_return 5
+    expect(data_objects.id).to eq 5
+
+    row.should_receive(:respond_to?).with(:name).and_return true
+    row.should_receive(:name).and_return "Jo"
+    expect(data_objects.name).to eq "Jo"
+
+    row.should_receive(:respond_to?).with(:qqq).and_return false
+    expect { data_objects.qqq }.to raise_error NoMethodError
+
+    row.should_receive(:respond_to?).with(:name).and_return true
+    expect(data_objects.respond_to? :name).to be_true
+
+    row.should_receive(:respond_to?).with(:qqq).and_return false
+    expect(data_objects.respond_to? :qqq).to be_false
+  end
+
   context "creates" do
     it "from given attributes" do
       attributes = {id: 12, name: "new name", price: 3.10}
@@ -153,20 +175,17 @@ describe "DataObjects" do
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      runtime_table.should_receive(:row).with(no_args()).and_return row
       row.should_receive(:<<).with id: 24
       expect(new_data_objects.create attributes).to be_true
     end
 
     it "from loaded data" do
       attributes = {name: "new name", price: 3.10}
-      runtime_table.stub(:row).with(no_args()).and_return row
       row.stub(:as_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      runtime_table.should_receive(:row).with(no_args()).and_return row
       row.should_receive(:<<).with id: 24
       expect(new_data_objects.create).to be_true
     end
@@ -175,13 +194,11 @@ describe "DataObjects" do
       attributes = {name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_create},
         [:params, {names: attributes.keys}]
-      runtime_table.stub(:row).with(no_args()).and_return row
       row.stub(:as_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      runtime_table.should_receive(:row).with(no_args()).and_return row
       row.should_receive(:<<).with id: 24
       expect(new_data_objects.load_and_create).to be_true
     end
@@ -199,7 +216,6 @@ describe "DataObjects" do
 
     it "from loaded data" do
       attributes = {id: 14, name: "new name", price: 3.10}
-      runtime_table.stub(:row).with(no_args()).and_return row
       row.stub(:as_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
@@ -211,7 +227,6 @@ describe "DataObjects" do
       attributes = {id: 18, name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_update},
         [:params, {names: attributes.keys}]
-      runtime_table.stub(:row).with(no_args()).and_return row
       row.stub(:as_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys

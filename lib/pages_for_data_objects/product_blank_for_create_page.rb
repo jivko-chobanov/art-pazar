@@ -26,8 +26,8 @@ class ProductBlankForCreatePage < Page
     false
   end
 
-  def load_and_get_html(product_type)
-    load product_type
+  def load_and_get_html(hash_with_product_type)
+    load hash_with_product_type[:product_type]
     html
   end
 end

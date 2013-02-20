@@ -54,7 +54,7 @@ describe "ProductBlankForCreatePage" do
     it "in one step" do
       load_from_args_prepare_fakes :paintings
       html_prepare_fakes
-      expect(product_blank_for_create_page.load_and_get_html :paintings).to eq "HTML for create product page"
+      expect(product_blank_for_create_page.load_and_get_html product_type: :paintings).to eq "HTML for create product page"
     end
   end
 end

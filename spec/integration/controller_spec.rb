@@ -5,6 +5,8 @@ describe "In integration" do
 
   context "visitor" do
     it "sees html for products" do
+      Pipe::Fake.should_receive(:get_from_session).and_return false
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
       expect(controller.action :list, :product).to eq "HTML for Products
 
 Products:
@@ -22,7 +24,9 @@ name value (9)  14.43
 "
     end
 
-    it "gets product page html"do
+    it "gets product page html" do
+      Pipe::Fake.should_receive(:get_from_session).and_return false
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
       expect(controller.action :details, :product).to eq(
 "HTML for Products, ProductSpecifications
 
@@ -38,6 +42,8 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
 
   context "seller" do
     it "gets product update page html" do
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
       expect(controller.action :blank_for_update, :product).to eq(
 "HTML for updating Products, ProductSpecifications fields:
 
@@ -49,8 +55,10 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
     end
 
     it "updates product and product specification" do
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
       expect(controller.action :update, :product).to eq true
-      expect(product_update_operation.pipe.logs).to eq(
+      expect(controller.logs).to eq(
         ["Got params: id_Pr = id_Pr param val, name_Pr = name_Pr param val, " <<
         "category_id_Pr = category_id_Pr param val, price_Pr = price_Pr param val",
         "Got params: id_PrS = id_PrS param val, string_1_PrS = string_1_PrS param val, " <<
@@ -65,7 +73,9 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
     end
 
     it "gets product create page html" do
-      expect(controller.action :blank_for_create, :product).to eq(
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      expect(controller.action :blank_for_create, :product, product_type: :paintings).to eq(
 "HTML for creating Products, ProductSpecifications with fields:
 
 Products:
@@ -76,8 +86,10 @@ string_1, smallint_1, string_2, string_3
     end
 
     it "creates product and product specification" do
-      expect(controller.action :create, :product).to eq true
-      expect(product_create_operation.pipe.logs).to eq(
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      expect(controller.action :create, :product, product_type: :paintings).to eq true
+      expect(controller.logs).to eq(
         ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
           "param val, price_Pr = price_Pr param val",
         "Got params: string_1_PrS " <<

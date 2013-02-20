@@ -58,7 +58,7 @@ describe "ProductBlankForUpdatePage" do
     it "in one step" do
       load_from_db_prepare_fakes 12
       html_prepare_fakes
-      expect(product_blank_for_update_page.load_and_get_html 12).to eq "HTML for update product page"
+      expect(product_blank_for_update_page.load_and_get_html id: 12).to eq "HTML for update product page"
     end
   end
 

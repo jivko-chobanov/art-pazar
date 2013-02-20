@@ -65,7 +65,22 @@ describe "Pipe" do
       expect(pipe.get :txt, txt: :no_products_for_home_page).not_to be_empty
     end
 
+    context "authenticates" do
+      it "gets from session authentication data" do
+        Pipe::Fake.should_receive(:get_from_session).and_return "from session"
+        expect(pipe.get :successful_authentication_in_session).to eq "from session"
+      end
+    end
+
     context "when fake params are wanted" do
+      it "gets one param if exists" do
+        Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 12
+        expect(pipe.get :param_if_exists, param_name: :id).to eq 12
+
+        Pipe::Fake.should_receive(:param_if_exists).with(:qqq).and_return false
+        expect(pipe.get :param_if_exists, param_name: :qqq).to eq false
+      end
+
       it "gets them for data object" do
         expect(pipe.get :params, names: [:name, :price])
           .to eq name: "name param val", price: "price param val"

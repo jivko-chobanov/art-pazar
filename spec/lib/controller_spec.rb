@@ -3,6 +3,8 @@ describe "Controller" do
   let(:product_list_page) { double }
   let(:user) { double }
   let(:product_details_page) { double }
+  let(:user_update_operation) { double }
+  let(:user_create_operation) { double }
   subject(:controller) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     Controller.new
@@ -17,111 +19,81 @@ describe "Controller" do
     stub_const "Support", Class.new
     stub_const "ProductListPage", Class.new
     stub_const "ProductDetailsPage", Class.new
-    stub_const "User", Class.new
+    stub_const "UserUpdateOperation", Class.new
+    stub_const "UserCreateOperation", Class.new
+    stub_const "CurrentUser", Class.new
 
     Pipe.stub(:new) { pipe }
     ProductListPage.stub(:new) { product_list_page }
     ProductDetailsPage.stub(:new) { product_details_page }
-    User.stub(:new) { user }
-    user.should_receive(:identify).with(no_args)
-    user.should_receive(:privileges=).with(kind_of Hash)
+    UserUpdateOperation.stub(:new) { user_update_operation }
+    UserCreateOperation.stub(:new) { user_create_operation }
+    CurrentUser.stub(:new).with(kind_of(Hash), kind_of(Hash)) { user }
   end
 
-  context "when wrong" do
-    before do
-      user.should_receive(:can).and_return true
-    end
-
-    it "not existing thing to see" do
-      Support.should_receive(:to_camel).with(:details).and_return "Details"
-      Support.should_receive(:to_camel).with(:qqq).and_return "Qqq"
-      Support.should_receive(:to_camel).with(:page).and_return "Page"
-      expect { controller.action :details, :qqq }.to raise_error RuntimeError
-    end
+  it "gives action log" do
+    controller.instance_variable_set :@action, user_create_operation
+    user_create_operation.should_receive(:pipe).and_return pipe
+    pipe.should_receive(:logs).and_return "the logs"
+    expect(controller.logs).to eq "the logs"
   end
 
-  context "visitor" do
-    context "can" do
-      before do
-        user.should_receive(:can).and_return true
-      end
-
-      it "see a list of products" do
-        product_list_page.should_receive(:load_and_get_html).and_return "ProductListPage HTML"
-        Support.should_receive(:to_camel).with(:list).and_return "List"
-        Support.should_receive(:to_camel).with(:product).and_return "Product"
-        Support.should_receive(:to_camel).with(:page).and_return "Page"
-        pipe.should_receive(:get).with(:param_if_exists, :id).and_return false
-        expect(controller.action :list, :product).to be_true
-      end
-
-      it "see product details" do
-        product_details_page.should_receive(:load_and_get_html).and_return "Product page HTML"
-        Support.should_receive(:to_camel).with(:details).and_return "Details"
-        Support.should_receive(:to_camel).with(:product).and_return "Product"
-        Support.should_receive(:to_camel).with(:page).and_return "Page"
-        pipe.should_receive(:get).with(:param_if_exists, :id).and_return 12
-        expect(controller.action :details, :product).to be_true
-      end
+  context "applies filters to the right page and data_object" do
+    it "if no data_object id" do
+      user.should_receive(:get_filters_if_access).with(:list, :product)
+        .and_return published: true
+      Support.should_receive(:to_camel_string).with(:list).and_return "List"
+      Support.should_receive(:to_camel_string).with(:product).and_return "Product"
+      Support.should_receive(:to_camel_string).with(:page).and_return "Page"
+      pipe.should_receive(:get).with(:param_if_exists, param_name: :id).and_return false
+      product_list_page.should_receive(:load_and_get_html).with(published: true)
+        .and_return "ProductListPage HTML"
+      expect(controller.action :list, :product).to be_true
     end
 
-#   context "cannot" do
-#     it "" do
-#     end
-#   end
-  end
-end
-__END__
-  context "registered" do
-    context "can" do
+    it "if params have data_object id" do
+      user.should_receive(:get_filters_if_access).with(:details, :product)
+        .and_return published: true
+      Support.should_receive(:to_camel_string).with(:details).and_return "Details"
+      Support.should_receive(:to_camel_string).with(:product).and_return "Product"
+      Support.should_receive(:to_camel_string).with(:page).and_return "Page"
+      pipe.should_receive(:get).with(:param_if_exists, param_name: :id).and_return 12
+      product_details_page.should_receive(:load_and_get_html).with(id: 12, published: true)
+        .and_return "Product page HTML"
+      expect(controller.action :details, :product).to be_true
     end
   end
 
-  context "sellers" do
-    before do
-      user.should_receive(:can).and_return true
+  context "applies filters to the right operation and data_object" do
+    it "if no data_object id and :a1, :a2 passed as tail args to action" do
+      user.should_receive(:get_filters_if_access).with(:create, :user)
+        .and_return userid: 14
+      Support.should_receive(:to_camel_string).with(:create).and_return "Create"
+      Support.should_receive(:to_camel_string).with(:user).and_return "User"
+      Support.should_receive(:to_camel_string).with(:operation).and_return "Operation"
+      pipe.should_receive(:get).with(:param_if_exists, param_name: :id).and_return false
+      user_create_operation.should_receive(:load_and_accomplish).with(userid: 14, k: :v)
+        .and_return "Blank"
+      expect(controller.action :create, :user, k: :v).to be_true
     end
 
-#   before do
-#     user.authenticate "username seller ok", "password seller ok"
-#   end
-
-    context "can operate with their own" do
-      it "products" do
-        expect(controller.action :blank_for_create, :product).to be_true
-        expect(controller.action :create, :product).to be_true
-        expect(controller.action :blank_for_update, :product).to be_true
-        expect(controller.action :update, :product).to be_true
-        expect(controller.action :delete, :product).to be_true
-      end
-
-      it "profile" do
-        expect(controller.action :blank_for_create, :user).to be_true
-        expect(controller.action :create, :user).to be_true
-        expect(controller.action :blank_for_update, :user).to be_true
-        expect(controller.action :update, :user).to be_true
-        expect(controller.action :delete, :user).to be_true
-      end
+    it "if params have data_object id" do
+      user.should_receive(:get_filters_if_access).with(:update, :user)
+        .and_return userid: 14
+      Support.should_receive(:to_camel_string).with(:update).and_return "Update"
+      Support.should_receive(:to_camel_string).with(:user).and_return "User"
+      Support.should_receive(:to_camel_string).with(:operation).and_return "Operation"
+      pipe.should_receive(:get).with(:param_if_exists, param_name: :id).and_return 73
+      user_update_operation.should_receive(:load_and_accomplish).with(id: 73, userid: 14)
+        .and_return "Blank"
+      expect(controller.action :update, :user).to be_true
     end
   end
-end
-__END__
-  context "admin" do
-    before do
-#     user.authenticate "username admin ok", "password admin ok"
-    end
 
-    context "can publish" do
-      it "products" do
-      end
-    end
-
-    context "can operate with any" do
-      it "products" do
-      end
-
-      it "profiles" do
-      end
+  context "raises error if no access" do
+    it "create product" do
+      user.should_receive(:get_filters_if_access).with(:create, :product).and_return false
+      expect { controller.action :create, :product }.to raise_error RuntimeError
     end
   end
 end

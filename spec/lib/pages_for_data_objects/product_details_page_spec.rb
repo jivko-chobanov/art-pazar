@@ -51,7 +51,7 @@ describe "ProductDetailsPage" do
     it "in one step" do
       load_prepare_fakes 12, :paintings
       html_prepare_fakes
-      expect(product_details_page.load_and_get_html 12).to eq "HTML for product page"
+      expect(product_details_page.load_and_get_html id: 12).to eq "HTML for product page"
     end
   end
 

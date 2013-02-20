@@ -116,6 +116,10 @@ class DataObjects
     end
   end
 
+  include Actions
+  include Load
+  include HTML
+
   def initialize(pipe = nil)
     @runtime_table = RuntimeTable.new
     @is_loaded = false
@@ -130,9 +134,21 @@ class DataObjects
     @attribute_groups.attributes_of group_name, options
   end
 
-  include Actions
-  include Load
-  include HTML
+  def set(attribute_values_by_name)
+    @runtime_table.row << attribute_values_by_name
+  end
+
+  def method_missing(name, *args, &block)
+    if @runtime_table.row.respond_to? name
+      @runtime_table.row.send(name)
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(name, include_private)
+    if @runtime_table.row.respond_to? name then true else super end
+  end
 
   private
 

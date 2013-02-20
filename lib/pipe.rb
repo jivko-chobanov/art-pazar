@@ -1,4 +1,7 @@
 class Pipe
+  class Fake
+  end
+
   module Log
     attr_reader :logs
 
@@ -38,7 +41,7 @@ class Pipe
     end
   end
 
-  def get(what, needs_and_input)
+  def get(what, needs_and_input = {})
     unless needs_and_input.is_a? Hash
       raise "needs_and_input should be Hash, not #{needs_and_input.class.name}, value: #{needs_and_input.to_s}"
     end
@@ -60,6 +63,10 @@ class Pipe
         else
           raise "needs_and_input does not include :data_obj_name"
         end
+      when :param_if_exists
+        Fake.param_if_exists @needs_and_input[:param_name]
+      when :successful_authentication_in_session
+        Fake.get_from_session
       when :params
         values_by_name = {}
         @needs_and_input[:names].inject(values_by_name) do |values_by_name, name|

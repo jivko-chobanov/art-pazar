@@ -23,8 +23,8 @@ class ProductCreateOperation < Operation
     end
   end
 
-  def load_and_accomplish(product_type)
-    load product_type
+  def load_and_accomplish(hash_with_product_type)
+    load hash_with_product_type[:product_type]
     accomplish
   end
 end
