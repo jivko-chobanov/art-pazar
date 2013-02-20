@@ -19,7 +19,8 @@ class Controller
           product: {all: [:see, :create, :update, :delete, :publish]},
           user: {all: [:see, :create, :update, :delete]},
         },
-      }
+      },
+      [:visitor, :registered, :seller, :admin]
     )
 
     filters = filters_or_raise_no_permissions(user, action_name, data_object_name)

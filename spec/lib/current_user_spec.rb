@@ -1,7 +1,7 @@
 describe "CurrentUser" do
   let(:pipe) { double }
   let(:user) { double }
-  subject(:current_user) do
+  subject(:visitor) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     user_of_type :visitor
   end
@@ -35,7 +35,8 @@ describe "CurrentUser" do
           product: {all: [:see, :create, :update, :delete, :publish]},
           user: {all: [:see, :create, :update, :delete]},
         },
-      }
+      },
+      [:visitor, :registered, :seller, :admin]
     )
   end
 
@@ -47,13 +48,16 @@ describe "CurrentUser" do
     Pipe.stub(:new) { pipe }
     Main::Users.stub(:new) { user }
   end
+  
+  xit "deletes" do
+  end
 
   context "(privileges)" do
     it "gets filters for data_object for access to be allowed" do
-      expect(current_user.get_filters_if_access :list, :product).to eq published: true
-      expect(current_user.get_filters_if_access :create, :product).to be_false
-      expect(current_user.get_filters_if_access :qqq, :product).to be_false
-      expect(current_user.get_filters_if_access :list, :qqq).to be_false
+      expect(visitor.get_filters_if_access :list, :product).to eq published: true
+      expect(visitor.get_filters_if_access :create, :product).to be_false
+      expect(visitor.get_filters_if_access :qqq, :product).to be_false
+      expect(visitor.get_filters_if_access :list, :qqq).to be_false
 
       seller = user_of_type :seller
       expect(seller.get_filters_if_access :blank_for_create, :product).to eq userid: 14
@@ -63,13 +67,21 @@ describe "CurrentUser" do
       expect(admin.get_filters_if_access :create, :product).to eq({})
     end
 
-    xit "inherits privileges" do
+    it "inherits privileges" do
+      seller = user_of_type :seller 
+      expect(seller.get_filters_if_access :list, :product).to eq [{published: true}, {userid: 14}]
+      expect(seller.get_filters_if_access :update, :user).to eq userid: 14
+
+      admin = user_of_type :admin 
+      expect(admin.get_filters_if_access :publish, :product).to eq({})
+      expect(admin.get_filters_if_access :delete, :product).to eq({})
+      expect(admin.get_filters_if_access :list, :product).to eq({})
     end
   end
 
   context "when not logged in" do
     it "is a visitor" do
-      expect(current_user.type).to eq :visitor
+      expect(visitor.type).to eq :visitor
     end
   end
 
@@ -85,8 +97,8 @@ describe "CurrentUser" do
       user.should_receive(:type).and_return :registered
       pipe.should_receive(:put)
         .with(:successful_authentication_in_session, id: 14, type: :registered)
-      expect(current_user.login).to be_true
-      expect(current_user.type).to eq :registered
+      expect(visitor.login).to be_true
+      expect(visitor.type).to eq :registered
     end
 
     it "false if wrong input" do
@@ -95,8 +107,8 @@ describe "CurrentUser" do
       pipe.should_receive(:get).with(:runtime_table_hashes,
         {attribute_group: :for_login, username: "wrong un", password: "wrong pass"})
         .and_return({})
-      expect(current_user.login).to be_false
-      expect(current_user.type).to eq :visitor
+      expect(visitor.login).to be_false
+      expect(visitor.type).to eq :visitor
     end
   end
 end

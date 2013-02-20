@@ -28,7 +28,7 @@ describe "Controller" do
     ProductDetailsPage.stub(:new) { product_details_page }
     UserUpdateOperation.stub(:new) { user_update_operation }
     UserCreateOperation.stub(:new) { user_create_operation }
-    CurrentUser.stub(:new).with(kind_of(Hash), kind_of(Hash)) { user }
+    CurrentUser.stub(:new).with(kind_of(Hash), kind_of(Hash), kind_of(Array)) { user }
   end
 
   it "gives action log" do
