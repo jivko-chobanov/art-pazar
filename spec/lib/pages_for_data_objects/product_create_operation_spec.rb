@@ -16,9 +16,9 @@ describe "ProductCreateOperation" do
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:create).with(no_args())
+    product.should_receive(:create).with(no_args()).and_return true
     product.should_receive(:id).with(no_args()).and_return 12
-    product_specifications.should_receive(:create).with(12)
+    product_specifications.should_receive(:create).with(12).and_return true
   end
 
   before do

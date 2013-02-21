@@ -10,10 +10,11 @@ class Controller
         update: [:update, :blank_for_update],
       }, {
         visitor: {product: {published: [:see]}},
-        registered: {},
+        registered: {
+          user: {own: [:see, :create, :update, :delete]},
+        },
         seller: {
           product: {own: [:see, :create, :update, :delete]},
-          user: {own: [:see, :create, :update, :delete]},
         },
         admin: {
           product: {all: [:see, :create, :update, :delete, :publish]},

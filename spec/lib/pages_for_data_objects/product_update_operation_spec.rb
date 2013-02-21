@@ -14,8 +14,8 @@ describe "ProductUpdateOperation" do
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:update).with(no_args())
-    product_specifications.should_receive(:update).with(no_args())
+    product.should_receive(:update).with(no_args()).and_return true
+    product_specifications.should_receive(:update).with(no_args()).and_return true
   end
 
   before do

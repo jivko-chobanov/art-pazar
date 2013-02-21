@@ -26,10 +26,11 @@ describe "CurrentUser" do
         update: [:update, :blank_for_update],
       }, {
         visitor: {product: {published: [:see]}},
-        registered: {},
+        registered: {
+          user: {own: [:see, :create, :update, :delete]},
+        },
         seller: {
           product: {own: [:see, :create, :update, :delete]},
-          user: {own: [:see, :create, :update, :delete]},
         },
         admin: {
           product: {all: [:see, :create, :update, :delete, :publish]},
@@ -56,6 +57,9 @@ describe "CurrentUser" do
       expect(visitor.get_filters_if_access :qqq, :product).to be_false
       expect(visitor.get_filters_if_access :list, :qqq).to be_false
 
+      registered = user_of_type :registered
+      expect(registered.get_filters_if_access :details, :user).to eq id: 14
+
       seller = user_of_type :seller
       expect(seller.get_filters_if_access :blank_for_create, :product).to eq userid: 14
       expect(seller.get_filters_if_access :create, :product).to eq userid: 14
@@ -67,7 +71,7 @@ describe "CurrentUser" do
     it "inherits privileges" do
       seller = user_of_type :seller 
       expect(seller.get_filters_if_access :list, :product).to eq [{published: true}, {userid: 14}]
-      expect(seller.get_filters_if_access :update, :user).to eq userid: 14
+      expect(seller.get_filters_if_access :update, :user).to eq id: 14
 
       admin = user_of_type :admin 
       expect(admin.get_filters_if_access :publish, :product).to eq({})

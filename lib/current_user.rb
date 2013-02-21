@@ -28,7 +28,11 @@ class CurrentUser
             when :all
               {}
             when :own
-              {userid: @id}
+              if data_object_name == :user
+                {id: @id}
+              else
+                {userid: @id}
+              end
             when :published
               {published: true}
             else

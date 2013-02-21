@@ -3,9 +3,6 @@ require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 describe "In integration" do
   let(:controller) { Controller.new }
 
-  xit "profiles..." do
-  end
-
   context "visitor" do
     it "sees html for products" do
       Pipe::Fake.should_receive(:get_from_session).and_return false

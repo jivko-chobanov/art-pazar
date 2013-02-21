@@ -16,9 +16,7 @@ class ProductUpdateOperation < Operation
 
   def accomplish
     super do
-      @product.update 
-      @product_specifications.update 
-      true
+      @product.update and @product_specifications.update 
     end
   end
 end

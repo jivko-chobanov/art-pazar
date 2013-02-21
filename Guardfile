@@ -16,7 +16,7 @@ group :u do
     watch(%r{^lib/(.+)\.rb$}) do |filename_without_extension|
       "spec/lib/#{filename_without_extension[1]}_spec.rb"
     end
-    callback(:start_begin) { puts "---------------------------------------------------------------------------------------------------------------------------------------------------" }
+    callback(:run_on_changes_begin) { puts "---------------------------------------------------------------------------------------------------------------------------------------------------" }
   end
 end
 
@@ -25,7 +25,8 @@ group :i do
     ignore %r{^.+(\.swp$|\.swo$|\~$)}
 
     watch %r{^spec/integration/.+\.rb$}
-    watch(%r{^lib/(.+)\.rb$}) { "spec/lib/integration/home_and_products_spec.rb" }
-    callback(:start_begin) { puts "===================================================================================================================================================" }
+    watch(%r{^lib/(.+)\.rb$}) { "spec/lib/integration/products_spec.rb" }
+    watch(%r{^lib/(.+)\.rb$}) { "spec/lib/integration/users_spec.rb" }
+    callback(:run_on_changes_begin) { puts "===================================================================================================================================================" }
   end
 end

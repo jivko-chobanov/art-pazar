@@ -2,10 +2,10 @@ module Main
   class Users < DataObjects
     def initialize(pipe = nil)
       @attribute_groups = AttributeGroups.new(
-        list: [:name, :price],
-        for_visitor: [:name, :price, :height],
-        for_update: [:id, :name, :category_id, :price],
-        for_create: [:name, :category_id, :price],
+        list_for_admin: [:name, :name, :surname],
+        details_for_registered: [:name, :surname, :type],
+        for_update: [:id, :name, :surname],
+        for_create: [:name, :surname, :username, :password],
       )
       super pipe
     end

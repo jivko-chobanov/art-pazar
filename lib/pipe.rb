@@ -206,6 +206,8 @@ class Pipe
           ->(index) { fake_product index }
         when "ProductSpecifications"
           ->(index) { fake_product_specifications index }
+        when "Users"
+          ->(index) { fake_user index }
         else
           raise "does not know how to make fake data for #{@needs_and_input[:data_obj_name]}"
       end
@@ -251,6 +253,18 @@ class Pipe
       updated_at: "updated at",
       product_type_id: i + 100,
       product_id: i + 1000,
+    })
+  end
+
+  def fake_user(i)
+    get_wated_attributes({
+      id: i + @needs_and_input[:offset],
+      name: "name value (#{i})",
+      surname: "surname value (#{i})",
+      type: "type value (#{i})",
+      created_at: "created_at value (#{i})",
+      updated_at: "updated_at value (#{i})",
+      product_type_id: 100 + i
     })
   end
 

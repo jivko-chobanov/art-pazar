@@ -8,6 +8,16 @@ describe "Pipe" do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
   end
 
+  def get_runtime_table_hashes(data_obj_name, attributes)
+    three_products_for_listing = pipe.get(:runtime_table_hashes, {
+      data_obj_name: data_obj_name,
+      attributes: attributes,
+      limit: 3
+    })
+    expect(three_products_for_listing.count).to be 3
+    expect(three_products_for_listing.first.keys).to eq attributes
+  end
+
   before :each do
     stub_const "Support", Class.new
     stub_const "Main", Class.new
@@ -29,13 +39,8 @@ describe "Pipe" do
   end
 
   it "gets the data for data object" do
-    three_products_for_listing = pipe.get(:runtime_table_hashes, {
-      data_obj_name: "Products",
-      attributes: [:name, :price],
-      limit: 3
-    })
-    expect(three_products_for_listing.count).to be 3
-    expect(three_products_for_listing.first.keys).to eq [:name, :price]
+    get_runtime_table_hashes "Products", [:name, :price]
+    get_runtime_table_hashes "Users", [:name, :surname]
   end
 
   it "gets logged actions" do

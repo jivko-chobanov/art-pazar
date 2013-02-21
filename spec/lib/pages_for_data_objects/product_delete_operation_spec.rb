@@ -8,8 +8,8 @@ describe "ProductDeleteOperation" do
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:delete).with(12)
-    product_specifications.should_receive(:delete).with(product_id: 12)
+    product.should_receive(:delete).with(12).and_return true
+    product_specifications.should_receive(:delete).with(product_id: 12).and_return true
   end
 
   before do

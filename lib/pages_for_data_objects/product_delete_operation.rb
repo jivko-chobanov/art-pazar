@@ -13,9 +13,7 @@ class ProductDeleteOperation < Operation
 
   def accomplish(id)
     super() do
-      @product.delete id
-      @product_specifications.delete product_id: id
-      true
+      @product.delete(id) and @product_specifications.delete product_id: id
     end
   end
 

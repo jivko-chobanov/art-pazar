@@ -17,9 +17,7 @@ class ProductCreateOperation < Operation
 
   def accomplish
     super do
-      @product.create
-      @product_specifications.create @product.id
-      true
+      @product.create and @product_specifications.create @product.id
     end
   end
 
