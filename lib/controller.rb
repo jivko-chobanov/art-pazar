@@ -12,13 +12,21 @@ class Controller
         visitor: {product: {published: [:see]}},
         registered: {
           user: {own: [:see, :create, :update, :delete]},
+          cart: {
+            buyer_own: [:see, :create, :update],
+            buyer_own_while_ordering: [:delete],
+          },
         },
         seller: {
           product: {own: [:see, :create, :update, :delete]},
+          cart: {
+            seller_own: [:see, :update],
+          },
         },
         admin: {
           product: {all: [:see, :create, :update, :delete, :publish]},
           user: {all: [:see, :create, :update, :delete]},
+          cart: {all: [:see, :create, :update, :delete]},
         },
       },
       [:visitor, :registered, :seller, :admin]
@@ -33,7 +41,11 @@ class Controller
 
     args_for_action = {}
     args_for_action[:id] = id_if_exists if id_if_exists
-    args_for_action.merge! filters
+    if filters.is_a? Array
+      args_for_action.merge! or_conditions: filters
+    else
+      args_for_action.merge! filters
+    end
     args_for_action.merge! additional_hash_args_for_action
     if action_type == :page
       @action.public_send :load_and_get_html, args_for_action

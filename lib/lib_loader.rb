@@ -14,6 +14,7 @@ class LibPaths
                         'data_objects/products',
                         'data_objects/product_specifications',
                         'data_objects/users',
+                        'data_objects/carts',
 
                         'pages_for_data_objects/product_list_page',
                         'pages_for_data_objects/product_details_page',
@@ -30,6 +31,14 @@ class LibPaths
                         'pages_for_data_objects/user_blank_for_update_page',
                         'pages_for_data_objects/user_update_operation',
                         'pages_for_data_objects/user_delete_operation',
+
+                        'pages_for_data_objects/cart_list_page',
+                        'pages_for_data_objects/cart_details_page',
+                        'pages_for_data_objects/cart_blank_for_create_page',
+                        'pages_for_data_objects/cart_create_operation',
+                        'pages_for_data_objects/cart_blank_for_update_page',
+                        'pages_for_data_objects/cart_update_operation',
+                        'pages_for_data_objects/cart_delete_operation',
 
                         'current_user',
                         'controller',

@@ -77,15 +77,15 @@ describe "Controller" do
       expect(controller.action :create, :user, k: :v).to be_true
     end
 
-    it "if params have data_object id" do
+    it "if params have data_object id and filters are many, joined with or" do
       user.should_receive(:get_filters_if_access).with(:update, :user)
-        .and_return userid: 14
+        .and_return [userid: 14, another: :filter]
       Support.should_receive(:to_camel_string).with(:update).and_return "Update"
       Support.should_receive(:to_camel_string).with(:user).and_return "User"
       Support.should_receive(:to_camel_string).with(:operation).and_return "Operation"
       pipe.should_receive(:get).with(:param_if_exists, param_name: :id).and_return 73
-      user_update_operation.should_receive(:load_and_accomplish).with(id: 73, userid: 14)
-        .and_return "Blank"
+      user_update_operation.should_receive(:load_and_accomplish)
+        .with(id: 73, or_conditions: [userid: 14, another: :filter]).and_return "Blank"
       expect(controller.action :update, :user).to be_true
     end
   end

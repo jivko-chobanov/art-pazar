@@ -27,11 +27,17 @@ class CurrentUser
           conditions_by_condition_name[condition_name] = case condition_name
             when :all
               {}
+            when :buyer_own
+              {buyer_id: @id}
+            when :seller_own
+              {seller_id: @id}
+            when :buyer_own_while_ordering
+              {buyer_id: @id, status: :ordering}
             when :own
               if data_object_name == :user
                 {id: @id}
               else
-                {userid: @id}
+                {user_id: @id}
               end
             when :published
               {published: true}

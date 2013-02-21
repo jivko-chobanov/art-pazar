@@ -1,10 +1,10 @@
-describe "Users" do
+describe "Carts" do
   let(:product_attribute_groups) { double put: nil }
   let(:runtime_table) { double }
   let(:row) { double }
-  subject(:user) do
+  subject(:cart) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-    Main::Users.new
+    Main::Carts.new
   end
 
   before do
@@ -23,8 +23,8 @@ describe "Users" do
 
   context "general information:" do
     it "gives abbreviation" do
-      expect(user.class_abbreviation).to be_kind_of String
-      expect(user.class_abbreviation).not_to be_empty
+      expect(cart.class_abbreviation).to be_kind_of String
+      expect(cart.class_abbreviation).not_to be_empty
     end
   end
 end

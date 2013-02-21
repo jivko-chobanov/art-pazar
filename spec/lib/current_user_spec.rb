@@ -61,8 +61,8 @@ describe "CurrentUser" do
       expect(registered.get_filters_if_access :details, :user).to eq id: 14
 
       seller = user_of_type :seller
-      expect(seller.get_filters_if_access :blank_for_create, :product).to eq userid: 14
-      expect(seller.get_filters_if_access :create, :product).to eq userid: 14
+      expect(seller.get_filters_if_access :blank_for_create, :product).to eq user_id: 14
+      expect(seller.get_filters_if_access :create, :product).to eq user_id: 14
 
       admin = user_of_type :admin
       expect(admin.get_filters_if_access :create, :product).to eq({})
@@ -70,7 +70,7 @@ describe "CurrentUser" do
 
     it "inherits privileges" do
       seller = user_of_type :seller 
-      expect(seller.get_filters_if_access :list, :product).to eq [{published: true}, {userid: 14}]
+      expect(seller.get_filters_if_access :list, :product).to eq [{published: true}, {user_id: 14}]
       expect(seller.get_filters_if_access :update, :user).to eq id: 14
 
       admin = user_of_type :admin 

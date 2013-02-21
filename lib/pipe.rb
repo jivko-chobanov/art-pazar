@@ -208,6 +208,8 @@ class Pipe
           ->(index) { fake_product_specifications index }
         when "Users"
           ->(index) { fake_user index }
+        when "Carts"
+          ->(index) { fake_cart index }
         else
           raise "does not know how to make fake data for #{@needs_and_input[:data_obj_name]}"
       end
@@ -256,18 +258,6 @@ class Pipe
     })
   end
 
-  def fake_user(i)
-    get_wated_attributes({
-      id: i + @needs_and_input[:offset],
-      name: "name value (#{i})",
-      surname: "surname value (#{i})",
-      type: "type value (#{i})",
-      created_at: "created_at value (#{i})",
-      updated_at: "updated_at value (#{i})",
-      product_type_id: 100 + i
-    })
-  end
-
   def fake_product(i)
     get_wated_attributes({
       id: i + @needs_and_input[:offset],
@@ -281,6 +271,30 @@ class Pipe
       depth: 13 + i,
       short_description: "short_description value (#{i})",
       info: "info value (#{i})",
+      created_at: "created_at value (#{i})",
+      updated_at: "updated_at value (#{i})",
+      product_type_id: 100 + i
+    })
+  end
+
+  def fake_user(i)
+    get_wated_attributes({
+      id: i + @needs_and_input[:offset],
+      name: "name value (#{i})",
+      surname: "surname value (#{i})",
+      type: "type value (#{i})",
+      created_at: "created_at value (#{i})",
+      updated_at: "updated_at value (#{i})",
+      product_type_id: 100 + i
+    })
+  end
+
+  def fake_cart(i)
+    get_wated_attributes({
+      id: i + @needs_and_input[:offset],
+      buyer_id: i + @needs_and_input[:offset],
+      seller_id: i + @needs_and_input[:offset],
+      status: "status value (#{i})",
       created_at: "created_at value (#{i})",
       updated_at: "updated_at value (#{i})",
       product_type_id: 100 + i
