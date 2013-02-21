@@ -3,6 +3,14 @@ describe "Support" do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
   end
 
+  it "#must_be_hash" do
+    expect { Support.must_be_hash({a: 1, b: 2}, "my_var")}.not_to raise_error RuntimeError
+    expect { Support.must_be_hash 43, "my_var" }.to raise_error RuntimeError
+    expect { Support.must_be_hash [:a, :b], "my_var" }.to raise_error RuntimeError
+    expect { Support.must_be_hash "ab", "my_var" }.to raise_error RuntimeError
+    expect { Support.must_be_hash Support, "my_var" }.to raise_error RuntimeError
+  end
+
   it "#to_camel_string" do
     expect(Support.to_camel_string "word").to eq "Word"
     expect(Support.to_camel_string :word).to eq "Word"
@@ -37,8 +45,7 @@ describe "Support" do
       {name: "Grogry", price: 8},
       {name: "Jocker Madagona", price: 99.2}
     ])
-    expected_html =
-      "NAME             PRICE\n" <<
+    expected_html = "NAME             PRICE\n" <<
       "My name          5.43\n" <<
       "Grogry           8\n" <<
       "Jocker Madagona  99.2\n"

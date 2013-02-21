@@ -15,21 +15,6 @@ describe "ProductCreateOperation" do
       .with attribute_group: :for_create, type: :paintings
   end
 
-  def load_from_args_prepare_fakes(type)
-    product_specifications.should_receive(:type=).with type
-  end
-
-  def html_prepare_fakes
-    product.stub(:attributes_of).and_return ["attribute names 1"]
-    product_specifications.stub(:attributes_of).and_return ["attribute names 2"]
-    product.stub(:data_obj_name).and_return "Products"
-    product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
-    pipe.stub(:get).with(:html_for_create, data_by_type: {
-      "Products" => ["attribute names 1"],
-      "ProductSpecifications" => ["attribute names 2"]
-    }).and_return "HTML for create product page"
-  end
-
   def accomplish_prepare_fakes
     product.should_receive(:create).with(no_args())
     product.should_receive(:id).with(no_args()).and_return 12

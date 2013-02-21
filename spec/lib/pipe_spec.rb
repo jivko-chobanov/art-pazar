@@ -12,11 +12,12 @@ describe "Pipe" do
     stub_const "Support", Class.new
     stub_const "Main", Class.new
     stub_const "Main::AnyDataObject", Class.new
+
+    Support.stub(:must_be_hash).and_return true
   end
 
   context "when undefined command" do
     it "raises exceptions" do
-      expect { pipe.get :runtime_table_hashes, 1 }.to raise_error RuntimeError
       expect { pipe.get :runtime_table_hashes, qqqq: 4 }.to raise_error RuntimeError
       expect { pipe.get :runtime_table_hashes, data_obj_name: "Products" }
         .to raise_error Pipe::MissingNeedOrInputError
@@ -48,7 +49,7 @@ describe "Pipe" do
   unless defined? Rails
     it "gets last created id of data_obj_name (fake)" do
       expect(pipe.get :last_created_id, data_obj_name: "any").to be_> 0
-      expect { pipe.get :last_created_id, "other" }.to raise_error RuntimeError
+      expect { pipe.get :last_created_id, other: :any }.to raise_error RuntimeError
     end
 
     it "creates a record in the database" do
@@ -59,6 +60,14 @@ describe "Pipe" do
     it "updates a record in the database" do
       expect(pipe.put "Products", id: 12, name: "new name", price: 2).to be_true
       expect(pipe.last_logged).to eq "Id 12 of Products updates name to new name, price to 2."
+    end
+
+    it "delete a record in the database" do
+      expect(pipe.delete "Products", id: 12).to be_true
+      expect(pipe.last_logged).to eq "Products with id = 12 is now deleted."
+
+      expect(pipe.delete "Products", name: "John").to be_true
+      expect(pipe.last_logged).to eq "Products with name = John is now deleted."
     end
 
     it "generates txt messages" do

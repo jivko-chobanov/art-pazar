@@ -3,6 +3,9 @@ require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 describe "In integration" do
   let(:controller) { Controller.new }
 
+  xit "profiles..." do
+  end
+
   context "visitor" do
     it "sees html for products" do
       Pipe::Fake.should_receive(:get_from_session).and_return false
@@ -41,6 +44,37 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
   end
 
   context "seller" do
+    it "gets product create page html" do
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      expect(controller.action :blank_for_create, :product, product_type: :paintings).to eq(
+"HTML for creating Products, ProductSpecifications with fields:
+
+Products:
+name, category_id, price
+ProductSpecifications:
+string_1, smallint_1, string_2, string_3
+")
+    end
+
+    it "creates product and product specification" do
+      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      expect(controller.action :create, :product, product_type: :paintings).to eq true
+      expect(controller.logs).to eq(
+        ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
+          "param val, price_Pr = price_Pr param val",
+        "Got params: string_1_PrS " <<
+          "= string_1_PrS param val, smallint_1_PrS = smallint_1_PrS param val, " <<
+          "string_2_PrS = string_2_PrS param val, string_3_PrS = string_3_PrS param val",
+        "Products creates name to name_Pr param val, category_id to " <<
+          "category_id_Pr param val, price to price_Pr param val.",
+        "ProductSpecifications creates string_1 to string_1_PrS param val, " <<
+          "smallint_1 to smallint_1_PrS param val, string_2 to string_2_PrS " <<
+          "param val, string_3 to string_3_PrS param val, product_id to 24."]
+      )
+    end
+
     it "gets product update page html" do
       Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
       Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
@@ -72,34 +106,13 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
       )
     end
 
-    it "gets product create page html" do
+    it "deletes product" do
       Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
-      expect(controller.action :blank_for_create, :product, product_type: :paintings).to eq(
-"HTML for creating Products, ProductSpecifications with fields:
-
-Products:
-name, category_id, price
-ProductSpecifications:
-string_1, smallint_1, string_2, string_3
-")
-    end
-
-    it "creates product and product specification" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
-      expect(controller.action :create, :product, product_type: :paintings).to eq true
+      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      expect(controller.action :delete, :product).to eq true
       expect(controller.logs).to eq(
-        ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
-          "param val, price_Pr = price_Pr param val",
-        "Got params: string_1_PrS " <<
-          "= string_1_PrS param val, smallint_1_PrS = smallint_1_PrS param val, " <<
-          "string_2_PrS = string_2_PrS param val, string_3_PrS = string_3_PrS param val",
-        "Products creates name to name_Pr param val, category_id to " <<
-          "category_id_Pr param val, price to price_Pr param val.",
-        "ProductSpecifications creates string_1 to string_1_PrS param val, " <<
-          "smallint_1 to smallint_1_PrS param val, string_2 to string_2_PrS " <<
-          "param val, string_3 to string_3_PrS param val, product_id to 24."]
+        ["Products with id = 16 is now deleted.",
+          "ProductSpecifications with product_id = 16 is now deleted."]
       )
     end
   end

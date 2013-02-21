@@ -49,9 +49,6 @@ describe "CurrentUser" do
     Main::Users.stub(:new) { user }
   end
   
-  xit "deletes" do
-  end
-
   context "(privileges)" do
     it "gets filters for data_object for access to be allowed" do
       expect(visitor.get_filters_if_access :list, :product).to eq published: true

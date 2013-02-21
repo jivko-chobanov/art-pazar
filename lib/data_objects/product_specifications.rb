@@ -54,9 +54,8 @@ module Main
       end
     end
 
-    def type=(product_type)
-      @type = Type.new product_type
-      @attribute_groups = AttributeGroups.new @type.attribute_groups_definitions
+    def initialize(pipe = nil)
+      super pipe
     end
 
     def load_from_db(needs)
@@ -69,8 +68,9 @@ module Main
       super
     end
 
-    def initialize(pipe = nil)
-      super pipe
+    def type=(product_type)
+      @type = Type.new product_type
+      @attribute_groups = AttributeGroups.new @type.attribute_groups_definitions
     end
 
     def class_abbreviation

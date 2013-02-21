@@ -3,10 +3,11 @@ require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 describe "In integration" do
   let(:product_list_page) { ProductListPage.new }
   let(:product_details_page) { ProductDetailsPage.new }
-  let(:product_blank_for_update_page) { ProductBlankForUpdatePage.new }
-  let(:product_update_operation) { ProductUpdateOperation.new }
   let(:product_blank_for_create_page) { ProductBlankForCreatePage.new }
   let(:product_create_operation) { ProductCreateOperation.new }
+  let(:product_blank_for_update_page) { ProductBlankForUpdatePage.new }
+  let(:product_update_operation) { ProductUpdateOperation.new }
+  let(:product_delete_operation) { ProductDeleteOperation.new }
 
   context "ProductsListPage" do
     it "makes html for products" do
@@ -43,6 +44,37 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
     end
   end
 
+  context "ProductBlankForCreatePage" do
+    it "gets product create page html" do
+      expect(product_blank_for_create_page.load_and_get_html product_type: :paintings).to eq(
+"HTML for creating Products, ProductSpecifications with fields:
+
+Products:
+name, category_id, price
+ProductSpecifications:
+string_1, smallint_1, string_2, string_3
+")
+    end
+  end
+
+  context "ProductCreateOperation" do
+    it "creates product and product specification" do
+      expect(product_create_operation.load_and_accomplish product_type: :paintings).to eq true
+      expect(product_create_operation.pipe.logs).to eq(
+        ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
+          "param val, price_Pr = price_Pr param val",
+        "Got params: string_1_PrS " <<
+          "= string_1_PrS param val, smallint_1_PrS = smallint_1_PrS param val, " <<
+          "string_2_PrS = string_2_PrS param val, string_3_PrS = string_3_PrS param val",
+        "Products creates name to name_Pr param val, category_id to " <<
+          "category_id_Pr param val, price to price_Pr param val.",
+        "ProductSpecifications creates string_1 to string_1_PrS param val, " <<
+          "smallint_1 to smallint_1_PrS param val, string_2 to string_2_PrS " <<
+          "param val, string_3 to string_3_PrS param val, product_id to 24."]
+      )
+    end
+  end
+
   context "ProductBlankForUpdatePage" do
     it "gets product update page html" do
       expect(product_blank_for_update_page.load_and_get_html id: 123).to eq(
@@ -74,33 +106,12 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
     end
   end
 
-  context "ProductBlankForCreatePage" do
-    it "gets product create page html" do
-      expect(product_blank_for_create_page.load_and_get_html product_type: :paintings).to eq(
-"HTML for creating Products, ProductSpecifications with fields:
-
-Products:
-name, category_id, price
-ProductSpecifications:
-string_1, smallint_1, string_2, string_3
-")
-    end
-  end
-
-  context "ProductCreateOperation" do
-    it "creates product and product specification" do
-      expect(product_create_operation.load_and_accomplish product_type: :paintings).to eq true
-      expect(product_create_operation.pipe.logs).to eq(
-        ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
-          "param val, price_Pr = price_Pr param val",
-        "Got params: string_1_PrS " <<
-          "= string_1_PrS param val, smallint_1_PrS = smallint_1_PrS param val, " <<
-          "string_2_PrS = string_2_PrS param val, string_3_PrS = string_3_PrS param val",
-        "Products creates name to name_Pr param val, category_id to " <<
-          "category_id_Pr param val, price to price_Pr param val.",
-        "ProductSpecifications creates string_1 to string_1_PrS param val, " <<
-          "smallint_1 to smallint_1_PrS param val, string_2 to string_2_PrS " <<
-          "param val, string_3 to string_3_PrS param val, product_id to 24."]
+  context "ProductDeleteOperation" do
+    it "deletes product" do
+      expect(product_delete_operation.load_and_accomplish id: 16).to eq true
+      expect(product_delete_operation.pipe.logs).to eq(
+        ["Products with id = 16 is now deleted.",
+          "ProductSpecifications with product_id = 16 is now deleted."]
       )
     end
   end

@@ -6,6 +6,13 @@ class Support
       end.to_s
     end
 
+    def must_be_hash(something, name_of_something)
+      unless something.is_a? Hash
+        raise "#{name_of_something.capitalize} should be Hash, not #{
+          name_of_something.class.name}, value: #{name_of_something.to_s}"
+      end
+    end
+
     def add_suffix(array, suffix)
       array.map { |value| work_with_string(value) { |string| string + suffix } }
     end

@@ -29,10 +29,18 @@ class Pipe
     initialize_log
   end
 
-  def put(data_obj_name, attributes)
-    unless attributes.is_a? Hash
-      raise "attributes should be Hash, not #{attributes.class.name}, value: #{attributes.to_s}"
+  def delete(data_obj_name, attributes)
+    Support.must_be_hash attributes, "attributes"
+
+    if defined? Rails
+    else
+      log "#{data_obj_name} with #{attributes.keys.first} = #{attributes.values.first} is now deleted."
+      true
     end
+  end
+
+  def put(data_obj_name, attributes)
+    Support.must_be_hash attributes, "attributes"
 
     if attributes.include? :id
       update data_obj_name, attributes[:id], attributes.select { |name, _| name != :id }
@@ -42,10 +50,7 @@ class Pipe
   end
 
   def get(what, needs_and_input = {})
-    unless needs_and_input.is_a? Hash
-      raise "needs_and_input should be Hash, not #{needs_and_input.class.name}, value: #{needs_and_input.to_s}"
-    end
-
+    Support.must_be_hash needs_and_input, "needs_and_input"
     @needs_and_input = needs_and_input
     
     case what

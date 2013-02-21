@@ -16,10 +16,11 @@ class LibPaths
                         'data_objects/users',
                         'pages_for_data_objects/product_list_page',
                         'pages_for_data_objects/product_details_page',
-                        'pages_for_data_objects/product_blank_for_update_page',
-                        'pages_for_data_objects/product_update_operation',
                         'pages_for_data_objects/product_blank_for_create_page',
                         'pages_for_data_objects/product_create_operation',
+                        'pages_for_data_objects/product_blank_for_update_page',
+                        'pages_for_data_objects/product_update_operation',
+                        'pages_for_data_objects/product_delete_operation',
                         'current_user',
                         'controller',
                       ]

@@ -43,7 +43,7 @@ describe "DataObjects" do
     elsif load_method == :load_from_db
       prep_load_from_db data_objects, args_for_load, expected_args_for_pipe
     else
-      raise "my rspec helper needs help"
+      raise "load method does not look like :load_from_..."
     end
     data_objects.send load_method, args_for_load
   end
@@ -159,6 +159,32 @@ describe "DataObjects" do
 
     row.should_receive(:respond_to?).with(:qqq).and_return false
     expect(data_objects.respond_to? :qqq).to be_false
+  end
+
+  context "deletes one data object" do
+    it "from given id or hash of one attribute by name" do
+      pipe.should_receive(:delete).with("DataObjects", id: 13).and_return true
+      expect(data_objects.delete 13).to be_true
+      pipe.should_receive(:delete).with("DataObjects", other_id: 45).and_return true
+      expect(data_objects.delete other_id: 45).to be_true
+
+      expect { data_objects.delete one: 1, other: :any }.to raise_error RuntimeError
+      expect { data_objects.delete "not id" }.to raise_error RuntimeError
+    end
+    
+    it "from loaded data" do
+      load_with_args :load_from_params, data_objects, {attribute_group: :id}, [:params, names: :id]
+      row.should_receive(:id).with(no_args).and_return 15
+      pipe.should_receive(:delete).with("DataObjects", id: 15).and_return true
+      expect(data_objects.delete).to be_true
+    end
+
+    it "load and create in one step" do
+      prep_load_from_params data_objects, {attribute_group: :id}, [:params, names: :id]
+      row.should_receive(:id).with(no_args).and_return 15
+      pipe.should_receive(:delete).with("DataObjects", id: 15).and_return true
+      expect(data_objects.load_and_delete).to be_true
+    end
   end
 
   context "creates" do

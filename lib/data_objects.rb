@@ -1,7 +1,7 @@
 class DataObjects
   module Actions
     def create(attributes = nil)
-      attributes = prepare_and_check_attributes_for_create attributes
+      attributes = get_or_check_attributes_for_create attributes
       success = put_to_pipe attributes
       @runtime_table.row << {id: @pipe.get(:last_created_id, data_obj_name: data_obj_name)}
       success
@@ -13,7 +13,7 @@ class DataObjects
     end
 
     def update(attributes = nil)
-      attributes = prepare_and_check_attributes_for_update attributes
+      attributes = get_or_check_attributes_for_update attributes
       put_to_pipe attributes
     end
 
@@ -22,9 +22,33 @@ class DataObjects
       update
     end
 
+    def delete(id_or_hash = nil)
+      attribute_by_name = id_or_hash_or_nil_to_hash_for_delete id_or_hash
+      @pipe.delete data_obj_name, attribute_by_name
+    end
+
+    def load_and_delete
+      load_from_params attribute_group: :id
+      delete
+    end
+
     private
 
-    def prepare_and_check_attributes_for_update(attributes)
+    def id_or_hash_or_nil_to_hash_for_delete(id_or_hash_or_nil)
+      attribute_by_name = {}
+      if id_or_hash_or_nil.nil? and @runtime_table.row.respond_to? :id
+        attribute_by_name[:id] = @runtime_table.row.id
+      elsif id_or_hash_or_nil.is_a? Fixnum
+        attribute_by_name[:id] = id_or_hash_or_nil
+      elsif id_or_hash_or_nil.is_a? Hash and id_or_hash_or_nil.size == 1
+        attribute_by_name = id_or_hash_or_nil
+      else
+        raise "Cannot delete using #{id_or_hash_or_nil}"
+      end
+      attribute_by_name
+    end
+
+    def get_or_check_attributes_for_update(attributes)
       if attributes.nil? then attributes = @runtime_table.row.as_hash end
       unless attributes.include? :id
         raise "Cannot update without an id"
@@ -32,7 +56,7 @@ class DataObjects
       attributes
     end
 
-    def prepare_and_check_attributes_for_create(attributes)
+    def get_or_check_attributes_for_create(attributes)
       if attributes.nil? then attributes = @runtime_table.row.as_hash end
       if attributes.include? :id
         raise "Cannot create with an id"
