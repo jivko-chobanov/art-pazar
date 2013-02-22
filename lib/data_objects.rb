@@ -1,7 +1,7 @@
 class DataObjects
   module Actions
     def create(attributes = nil)
-      attributes = get_attributes_and_make_row_under_construction attributes
+      attributes = get_attributes_and_make_last_row_under_construction attributes
       attributes = check_attributes_for_create attributes
 
       success = put_to_pipe attributes
@@ -39,10 +39,10 @@ class DataObjects
 
     private
 
-    def get_attributes_and_make_row_under_construction(attributes)
+    def get_attributes_and_make_last_row_under_construction(attributes)
       if attributes.nil?
         unless @runtime_table.has_row_under_construction?
-          @runtime_table.make_row_under_construction
+          @runtime_table.make_last_row_under_construction
         end
         @runtime_table.row_under_construction.to_hash
       else
@@ -170,6 +170,10 @@ class DataObjects
     self.class.name.split("::").last
   end
 
+  def size
+    @runtime_table.rows_count
+  end
+
   def attributes_of(group_name, options = {})
     @attribute_groups.attributes_of group_name, options
   end
@@ -198,7 +202,7 @@ class DataObjects
 
   def put_to_runtime_table(rows_as_hashes_or_row_as_hash, options = {})
     if options.include? :in_row_under_construction
-      @runtime_table.row_under_construction << rows_as_hashes_or_row_as_hash
+      @runtime_table.row_under_construction rows_as_hashes_or_row_as_hash
     else
       rows_as_hashes = to_rows_as_hashes rows_as_hashes_or_row_as_hash
       @runtime_table << rows_as_hashes

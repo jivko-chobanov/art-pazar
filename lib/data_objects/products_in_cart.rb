@@ -6,7 +6,7 @@ module Main
         list_for_admin: all_attributes,
         details: all_attributes,
         for_update: [:id, :quantity, :status],
-        for_create: all_attributes.delete(:id),
+        for_create: all_attributes.select { |attribute| attribute != :id },
       )
       super pipe
     end

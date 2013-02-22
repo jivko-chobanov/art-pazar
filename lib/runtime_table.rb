@@ -31,13 +31,21 @@ class RuntimeTable
   end
 
   module RowUnderConstruction
-    attr_reader :row_under_construction
+    def row_under_construction(attribute_values_by_name = nil)
+      if attribute_values_by_name
+        if has_row_under_construction?
+          raise  "There already is one row under construction."
+        end
+        @row_under_construction = Row.new attribute_values_by_name
+      end
+      @row_under_construction
+    end
 
     def has_row_under_construction?
       !!@row_under_construction
     end
 
-    def make_row_under_construction
+    def make_last_row_under_construction
       if empty?
         raise "There is no row to be made row under construction."
       elsif has_row_under_construction?
@@ -94,6 +102,10 @@ class RuntimeTable
     end
   end
 
+  def rows_count
+    @rows.count
+  end
+
   private
 
   def must_be_compatible_then(array_of_values_by_column_name)
@@ -111,10 +123,6 @@ class RuntimeTable
     array_of_values_by_column_name.all? do |values_by_column_name|
       column_names.sort == values_by_column_name.keys.sort
     end
-  end
-
-  def rows_count
-    @rows.count
   end
 
   def to_rows(array_of_values_by_column_name)

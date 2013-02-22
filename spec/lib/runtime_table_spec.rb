@@ -86,32 +86,40 @@ describe "RuntimeTable" do
         expect(people_s_table.has_row_under_construction?).to be_false
 
         runtime_table << [{name: "John", age: 22}]
-        runtime_table.make_row_under_construction
+        runtime_table.make_last_row_under_construction
         expect(runtime_table.has_row_under_construction?).to be_true
       end
 
-      it "makes it" do
-        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+      it "makes it from last row" do
+        expect { runtime_table.make_last_row_under_construction }.to raise_error RuntimeError
 
         runtime_table << [{name: "John", age: 22}]
-        runtime_table.make_row_under_construction
+        runtime_table.make_last_row_under_construction
 
-        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+        expect { runtime_table.make_last_row_under_construction }.to raise_error RuntimeError
 
         runtime_table << [{name: "John", age: 22}]
-        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+        expect { runtime_table.make_last_row_under_construction }.to raise_error RuntimeError
+      end
+
+      it "makes it using given attributes by name" do
+        runtime_table << [{name: "John", age: 22}]
+        runtime_table << [{name: "Ana", age: 22}]
+        runtime_table.row_under_construction name: "Peter"
+        expect(runtime_table.has_row_under_construction?).to be_true
+        expect(runtime_table.rows_count).to eq 2
       end
 
       it "gets it" do
         runtime_table << [{name: "John", age: 22}]
         old_row = runtime_table.row
-        runtime_table.make_row_under_construction
+        runtime_table.make_last_row_under_construction
         expect(runtime_table.row_under_construction).to be old_row
       end
 
       it "completes it" do
         runtime_table << [{name: "John", age: 22}]
-        runtime_table.make_row_under_construction
+        runtime_table.make_last_row_under_construction
         runtime_table.complete_the_row_under_construction id: 8
         expect(runtime_table.has_row_under_construction?).to be_false
         expect(runtime_table.empty?).to be_false
@@ -126,6 +134,14 @@ describe "RuntimeTable" do
 
     it "gives column names" do
       expect(people_s_table.column_names).to eq [:name, :age]
+    end
+
+    it "gives rows count" do
+      expect(people_s_table.rows_count).to eq 2
+      expect(runtime_table.rows_count).to eq 0
+
+      runtime_table << [{name: "John", age: 22}]
+      expect(runtime_table.rows_count).to eq 1
     end
   end
 end

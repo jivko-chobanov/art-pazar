@@ -36,7 +36,7 @@ describe "DataObjects" do
     Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
       .and_return "content got by pipe"
     if args_for_load.include? :in_row_under_construction
-      row_under_construction.should_receive(:<<).with "content got by pipe"
+      runtime_table.should_receive(:row_under_construction).with("content got by pipe")
     else
       runtime_table.should_receive(:<<).with ["content got by pipe"]
     end
@@ -97,29 +97,38 @@ describe "DataObjects" do
     expect(data_objects.loaded_to_hashes).to eq "content to hash"
   end
 
-  it "gives information about data" do
-    expect(DataObjects.new.data_obj_name).to eq "DataObjects"
+  context "gives information about data" do
+    it "data object name" do
+      expect(DataObjects.new.data_obj_name).to eq "DataObjects"
+    end
 
-    empty_data_objects = new_data_objects
-    expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError
-    expect(empty_data_objects.loaded?).to be_false
+    it "num items" do
+      runtime_table.should_receive(:rows_count).and_return 10
+      expect(data_objects.size).to eq 10
+    end
 
-    load_with_args :load_from_db, empty_data_objects, {attribute_group: :list, limit: 0},
-      [:runtime_table_hashes,
-        {attributes: [:name, :price], limit: 0, data_obj_name: "DataObjects"}]
+    it "checks with #loaded?, #loaded_empty_result?" do
+      empty_data_objects = new_data_objects
+      expect { empty_data_objects.loaded_empty_result? }.to raise_error RuntimeError
+      expect(empty_data_objects.loaded?).to be_false
 
-    runtime_table.stub(:empty?).and_return true
-    expect(empty_data_objects.loaded?).to be_true
-    expect(empty_data_objects.loaded_empty_result?).to be_true
+      load_with_args :load_from_db, empty_data_objects, {attribute_group: :list, limit: 0},
+        [:runtime_table_hashes,
+          {attributes: [:name, :price], limit: 0, data_obj_name: "DataObjects"}]
 
-    not_empty_data_objects = new_data_objects
-    load_with_args :load_from_db, not_empty_data_objects, {attribute_group: :list, limit: 1},
-      [:runtime_table_hashes,
-        {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
-    runtime_table.stub(:empty?).and_return false
-    expect(not_empty_data_objects.loaded_empty_result?).to be_false
+      runtime_table.stub(:empty?).and_return true
+      expect(empty_data_objects.loaded?).to be_true
+      expect(empty_data_objects.loaded_empty_result?).to be_true
+
+      not_empty_data_objects = new_data_objects
+      load_with_args :load_from_db, not_empty_data_objects, {attribute_group: :list, limit: 1},
+        [:runtime_table_hashes,
+          {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
+      runtime_table.stub(:empty?).and_return false
+      expect(not_empty_data_objects.loaded_empty_result?).to be_false
+    end
   end
-  
+
   context "loads" do
     it "from params" do
       load_with_args :load_from_params, data_objects,
@@ -228,7 +237,7 @@ describe "DataObjects" do
 
         it "(no attributes are given)" do
           runtime_table.should_receive(:has_row_under_construction?).with(no_args).and_return false
-          runtime_table.stub(:make_row_under_construction).with(no_args)
+          runtime_table.should_receive(:make_last_row_under_construction).with(no_args)
           runtime_table.should_receive(:row_under_construction).with(no_args).and_raise RuntimeError
           expect { new_data_objects.create }.to raise_error RuntimeError
         end
@@ -250,10 +259,11 @@ describe "DataObjects" do
     context "from loaded data" do
       it "in single row" do
         attributes = {name: "new name", price: 3.10}
-        runtime_table.stub(:has_row_under_construction?).with(no_args).and_return false
-        runtime_table.stub(:make_row_under_construction).with(no_args)
-        row_under_construction.stub(:to_hash).with(no_args).and_return attributes
-        data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+        runtime_table.should_receive(:has_row_under_construction?).with(no_args)
+          .and_return false
+        runtime_table.should_receive(:make_last_row_under_construction).with(no_args)
+        row_under_construction.should_receive(:to_hash).with(no_args).and_return attributes
+        data_object_attribute_groups.should_receive(:attributes_of).with(:for_create, {})
           .and_return attributes.keys
 
         pipe.should_receive(:put).with("DataObjects", attributes).and_return true

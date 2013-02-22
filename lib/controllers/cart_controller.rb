@@ -1,7 +1,7 @@
 class CartController
   def initialize
-    @pipe, @cart = Pipe.new, Main::Carts.new(:single)
-    @products = Main::ProductsInCart.new
+    @pipe, @cart = Pipe.new, Main::Carts.new
+    @products_in_cart = Main::ProductsInCart.new
     add_product_or_raise
     @cart.load_and_create
   end
@@ -11,7 +11,7 @@ class CartController
   end
 
   def products_count
-    @products.size
+    @products_in_cart.size
   end
 
 # def
@@ -19,7 +19,7 @@ class CartController
   private
 
   def add_product_or_raise
-    unless @products.load_and_create
+    unless @products_in_cart.load_and_create
       raise "Cannot add product from params into the cart."
     end
   end
