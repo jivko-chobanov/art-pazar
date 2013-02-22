@@ -52,7 +52,7 @@ class Pipe
   def get(what, needs_and_input = {})
     Support.must_be_hash needs_and_input, "needs_and_input"
     @needs_and_input = needs_and_input
-    
+
     case what
       when :runtime_table_hashes
         get_data
@@ -97,7 +97,7 @@ class Pipe
   def create(data_obj_name, attributes)
     if defined? Rails
     else
-      log "#{data_obj_name} creates " << 
+      log "#{data_obj_name} creates " <<
         attributes.map { |name, value| "#{name} to #{value}" }.join(", ") + "."
       true
     end
@@ -226,7 +226,7 @@ class Pipe
       @needs_and_input[:attributes].include? name
     end
   end
-    
+
   def fake_product_specifications(i)
     get_wated_attributes({
       id: i + @needs_and_input[:offset],

@@ -26,7 +26,7 @@ module Main
           raise "Undefined product type."
         end
 
-        @product_type = product_type 
+        @product_type = product_type
         @type_data = @data[@product_type]
       end
 

@@ -7,7 +7,7 @@ describe "UserBlankForUpdatePage" do
   end
 
   def load_from_db_prepare_fakes(id)
-    user.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1 
+    user.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
   end
 
   def html_prepare_fakes

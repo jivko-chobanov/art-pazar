@@ -14,7 +14,7 @@ class CartUpdateOperation < Operation
 
   def accomplish
     super do
-      @cart.update 
+      @cart.update
     end
   end
 end

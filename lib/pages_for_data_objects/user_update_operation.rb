@@ -14,7 +14,7 @@ class UserUpdateOperation < Operation
 
   def accomplish
     super do
-      @user.update 
+      @user.update
     end
   end
 end

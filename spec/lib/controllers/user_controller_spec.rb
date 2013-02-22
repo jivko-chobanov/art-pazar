@@ -49,7 +49,7 @@ describe "UserController" do
     Pipe.stub(:new) { pipe }
     Main::Users.stub(:new) { user }
   end
-  
+
   context "(privileges)" do
     it "gets filters for data_object for access to be allowed" do
       expect(visitor.get_filters_if_access :list, :product).to eq published: true
@@ -69,11 +69,11 @@ describe "UserController" do
     end
 
     it "inherits privileges" do
-      seller = user_of_type :seller 
+      seller = user_of_type :seller
       expect(seller.get_filters_if_access :list, :product).to eq [{published: true}, {user_id: 14}]
       expect(seller.get_filters_if_access :update, :user).to eq id: 14
 
-      admin = user_of_type :admin 
+      admin = user_of_type :admin
       expect(admin.get_filters_if_access :publish, :product).to eq({})
       expect(admin.get_filters_if_access :delete, :product).to eq({})
       expect(admin.get_filters_if_access :list, :product).to eq({})

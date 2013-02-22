@@ -8,7 +8,7 @@ class CartBlankForUpdatePage < Page
 
   def load(id = nil)
     super() do
-      @cart.load_from_db id: id, attribute_group: :for_update, limit: 1 
+      @cart.load_from_db id: id, attribute_group: :for_update, limit: 1
     end
   end
 

@@ -14,7 +14,7 @@ describe "RuntimeTable" do
   before do
     stub_const "Support", Class.new
   end
-  
+
   context "Row" do
     it "adds named values on initialization and gives values" do
       expect(johns_row.name).to eq "John"

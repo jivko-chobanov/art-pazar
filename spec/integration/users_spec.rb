@@ -38,7 +38,7 @@ name, surname, username, password
       expect(controller.logs).to eq(
         ["Got params: name_U = name_U param val, surname_U = surname_U param val, " <<
            "username_U = username_U param val, password_U = password_U param val",
-        "Users creates name to name_U param val, surname to surname_U param val, " << 
+        "Users creates name to name_U param val, surname to surname_U param val, " <<
            "username to username_U param val, password to password_U param val."]
       )
     end

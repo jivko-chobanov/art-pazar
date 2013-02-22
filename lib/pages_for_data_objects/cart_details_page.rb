@@ -6,7 +6,7 @@ class CartDetailsPage < Page
 
   def load(id)
     super() do
-      @cart.load_from_db id: id, attribute_group: :details, limit: 1 
+      @cart.load_from_db id: id, attribute_group: :details, limit: 1
     end
   end
 

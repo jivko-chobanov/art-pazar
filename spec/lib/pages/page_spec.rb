@@ -23,7 +23,7 @@ describe "Page" do
       expect(page.load_and_get_html { "the HTML" }).to eq "the HTML"
     end
   end
- 
+
   it "raises errors" do
     page.stub(:pipe_name_of_txt_if_empty_content).and_return false
     page.should_receive(:loaded?).and_return false

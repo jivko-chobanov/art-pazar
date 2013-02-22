@@ -210,7 +210,7 @@ describe "DataObjects" do
       expect { data_objects.delete one: 1, other: :any }.to raise_error RuntimeError
       expect { data_objects.delete "not id" }.to raise_error RuntimeError
     end
-    
+
     it "from loaded data" do
       load_with_args :load_from_params, data_objects, {attribute_group: :id}, [:params, names: :id]
       row.should_receive(:id).with(no_args).and_return 15
@@ -375,7 +375,7 @@ describe "DataObjects" do
 
       expect(data_objects.html).to eq "html got by pipe"
     end
-    
+
     it "presents update interface" do
       load_with_args :load_from_db, data_objects, {attribute_group: :for_update, limit: 1},
         [:runtime_table_hashes,

@@ -7,7 +7,7 @@ describe "CartBlankForUpdatePage" do
   end
 
   def load_from_db_prepare_fakes(id)
-    cart.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1 
+    cart.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
   end
 
   def html_prepare_fakes

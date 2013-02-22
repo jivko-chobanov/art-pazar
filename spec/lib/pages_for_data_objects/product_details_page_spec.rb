@@ -8,10 +8,10 @@ describe "ProductDetailsPage" do
   end
 
   def load_prepare_fakes(id, type)
-    product.stub(:load_from_db).with id: id, attribute_group: :for_visitor, limit: 1 
+    product.stub(:load_from_db).with id: id, attribute_group: :for_visitor, limit: 1
     product.should_receive(:type).and_return :paintings
     product_specifications.stub(:load_from_db)
-      .with id: id, type: :paintings, attribute_group: :for_visitor, limit: 1 
+      .with id: id, type: :paintings, attribute_group: :for_visitor, limit: 1
   end
 
   def html_prepare_fakes

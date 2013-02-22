@@ -7,7 +7,7 @@ describe "CartController" do
 
     cart_data_object.should_receive(:load_and_create).with(no_args).and_return true
     products_in_cart.should_receive(:load_and_create).with(no_args).and_return true
-    CartController.new 
+    CartController.new
   end
 
   before :all do

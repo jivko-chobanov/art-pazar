@@ -9,12 +9,12 @@ class ProductBlankForUpdatePage < Page
 
   def load(id = nil)
     super() do
-      @product.load_from_db id: id, attribute_group: :for_update, limit: 1 
+      @product.load_from_db id: id, attribute_group: :for_update, limit: 1
       @product_specifications.load_from_db(
         id: id,
         type: @product.type,
         attribute_group: :for_update,
-        limit: 1 
+        limit: 1
       )
     end
   end

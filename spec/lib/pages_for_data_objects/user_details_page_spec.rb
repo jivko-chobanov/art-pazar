@@ -7,7 +7,7 @@ describe "UserDetailsPage" do
   end
 
   def load_prepare_fakes(id)
-    user.stub(:load_from_db).with id: id, attribute_group: :details_for_registered, limit: 1 
+    user.stub(:load_from_db).with id: id, attribute_group: :details_for_registered, limit: 1
   end
 
   def html_prepare_fakes
