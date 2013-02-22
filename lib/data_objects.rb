@@ -29,7 +29,12 @@ class DataObjects
 
     def delete(id_or_hash = nil)
       attribute_by_name = id_or_hash_or_nil_to_hash_for_delete id_or_hash
-      @pipe.delete data_obj_name, attribute_by_name
+      if @pipe.delete data_obj_name, attribute_by_name
+        @runtime_table.remove attribute_by_name
+        true
+      else
+        false
+      end
     end
 
     def load_and_delete
@@ -159,11 +164,16 @@ class DataObjects
   include Actions
   include Load
   include HTML
+  include Enumerable
 
   def initialize(pipe = nil)
     @runtime_table = RuntimeTable.new
     @is_loaded = false
     pipe ? @pipe = pipe : @pipe = Pipe.new
+  end
+
+  def each(&block)
+    @runtime_table.each &block
   end
 
   def data_obj_name

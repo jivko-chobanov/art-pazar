@@ -3,7 +3,7 @@ describe "RuntimeTable" do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
     RuntimeTable.new
   end
-  let(:people_s_table) { RuntimeTable.new [{name: "John", age: 22}, {name: "Ana", age: 19}] }
+  let(:people_s_table) { RuntimeTable.new [{name: "John", age: 22}, {name: "Ana", age: 22}] }
   let(:johns_row) { RuntimeTable::Row.new name: "John", age: 22 }
   let(:row) { RuntimeTable::Row.new }
 
@@ -63,14 +63,14 @@ describe "RuntimeTable" do
     end
 
     it "adds rows on initialization and gives them as hashes" do
-      expect(people_s_table.to_hashes).to eq [{name: "John", age: 22}, {name: "Ana", age: 19}]
+      expect(people_s_table.to_hashes).to eq [{name: "John", age: 22}, {name: "Ana", age: 22}]
     end
 
     context "adds new rows" do
       it "when ok" do
         people_s_table << [{name: "Peg", age: 44}]
         expect(people_s_table.to_hashes).to eq(
-          [{name: "John", age: 22}, {name: "Ana", age: 19}, {name: "Peg", age: 44}])
+          [{name: "John", age: 22}, {name: "Ana", age: 22}, {name: "Peg", age: 44}])
       end
 
       it "when different attributes - raises error" do
@@ -78,6 +78,14 @@ describe "RuntimeTable" do
         expect { people_s_table << [{name: "Peg", other: 44}] }.to raise_error RuntimeError
         expect { people_s_table << [{name: "Peg"}] }.to raise_error RuntimeError
       end
+    end
+
+    it "removes using attribute_by_name" do
+      people_s_table.remove name: "John"
+      expect(people_s_table.rows_count).to eq 1
+
+      people_s_table.remove age: 22
+      expect(people_s_table.rows_count).to eq 0
     end
 
     context "works with row under construction" do

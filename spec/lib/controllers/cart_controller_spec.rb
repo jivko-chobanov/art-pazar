@@ -39,15 +39,27 @@ describe "CartController" do
 
   it "new product can be added" do
     products_in_cart.should_receive(:load_and_create).with(no_args).and_return true
-    expect { cart_controller.add_product_from_params }.not_to raise_error RuntimeError
+    cart_controller.add_product_from_params
 
     products_in_cart.should_receive(:load_and_create).with(no_args).and_return false
     expect { cart_controller.add_product_from_params }.to raise_error RuntimeError
   end
 
-  xit "quantity of a product can be changed" do
+  it "quantity of a product can be changed" do
     products_in_cart.should_receive(:update).with(id: 13, quantity: 2).and_return true
+    products_in_cart.should_receive(:each).and_yield id: 13, quantity: 8
     expect(cart_controller.update_quantity id: 13, quantity: 2).to be_true
+
+    expect { cart_controller.update_quantity quantity: 2 }.to raise_error RuntimeError
+    expect { cart_controller.update_quantity id: 13 }.to raise_error RuntimeError
+
+    products_in_cart.should_receive(:each).and_yield quantity: 8
+    expect { cart_controller.update_quantity id: 13, quantity: 2 }.to raise_error RuntimeError
+  end
+
+  it "products can be removed from cart" do
+    products_in_cart.should_receive(:delete).with(24).and_return true
+    expect(cart_controller.remove 24).to be_true
   end
 
   xit "is deleted when the last product is deleted" do

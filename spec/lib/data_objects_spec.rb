@@ -74,6 +74,11 @@ describe "DataObjects" do
     expect { DataObjects.new(Pipe.new) }.not_to raise_error RuntimeError
   end
 
+  it "is enumerable" do
+    runtime_table.should_receive(:each)
+    expect(data_objects.map(&:name)).to eq []
+  end
+
   it "gives attributes of attribute groups" do
     data_object_attribute_groups.stub(:attributes_of).with(:list, {}).and_return [:name, :price]
     expect(data_objects.attributes_of :list).to eq [:name, :price]
@@ -196,8 +201,10 @@ describe "DataObjects" do
   context "deletes one data object" do
     it "from given id or hash of one attribute by name" do
       pipe.should_receive(:delete).with("DataObjects", id: 13).and_return true
+      runtime_table.should_receive(:remove).with id: 13
       expect(data_objects.delete 13).to be_true
       pipe.should_receive(:delete).with("DataObjects", other_id: 45).and_return true
+      runtime_table.should_receive(:remove).with other_id: 45
       expect(data_objects.delete other_id: 45).to be_true
 
       expect { data_objects.delete one: 1, other: :any }.to raise_error RuntimeError
@@ -208,6 +215,7 @@ describe "DataObjects" do
       load_with_args :load_from_params, data_objects, {attribute_group: :id}, [:params, names: :id]
       row.should_receive(:id).with(no_args).and_return 15
       pipe.should_receive(:delete).with("DataObjects", id: 15).and_return true
+      runtime_table.should_receive(:remove).with id: 15
       expect(data_objects.delete).to be_true
     end
 
@@ -215,7 +223,15 @@ describe "DataObjects" do
       prep_load_from_params data_objects, {attribute_group: :id}, [:params, names: :id]
       row.should_receive(:id).with(no_args).and_return 15
       pipe.should_receive(:delete).with("DataObjects", id: 15).and_return true
+      runtime_table.should_receive(:remove).with id: 15
       expect(data_objects.load_and_delete).to be_true
+    end
+
+    it "is false when pipe fails" do
+      prep_load_from_params data_objects, {attribute_group: :id}, [:params, names: :id]
+      row.should_receive(:id).with(no_args).and_return 15
+      pipe.should_receive(:delete).with("DataObjects", id: 15).and_return false
+      expect(data_objects.load_and_delete).to be_false
     end
   end
 
