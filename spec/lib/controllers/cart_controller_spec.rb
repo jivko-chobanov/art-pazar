@@ -58,10 +58,27 @@ describe "CartController" do
   end
 
   it "products can be removed from cart" do
-    products_in_cart.should_receive(:delete).with(24).and_return true
-    expect(cart_controller.remove 24).to be_true
+    products_in_cart.should_receive(:size).with(no_args).and_return 2
+    products_in_cart.should_receive(:delete).with(id: 24).and_return true
+    expect(cart_controller.remove id: 24).to be_true
   end
 
-  xit "is deleted when the last product is deleted" do
+  it "is deleted when the last product is deleted" do
+    products_in_cart.should_receive(:size).with(no_args).and_return 1
+    products_in_cart.should_receive(:delete).with(id: 24).and_return true
+    cart_data_object.should_receive(:delete).with(no_args).and_return true
+    expect(cart_controller.remove id: 24).to be_true
+  end
+
+  it "fails when the cart fails to be deleted" do
+    products_in_cart.should_receive(:size).with(no_args).and_return 1
+    products_in_cart.should_receive(:delete).with(id: 24).and_return true
+    cart_data_object.should_receive(:delete).with(no_args).and_return false
+    expect(cart_controller.remove id: 24).to be_false
+  end
+
+  it "fails when the last product fails to be deleted" do
+    products_in_cart.should_receive(:delete).with(id: 24).and_return false
+    expect(cart_controller.remove id: 24).to be_false
   end
 end

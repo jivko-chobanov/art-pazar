@@ -32,7 +32,11 @@ class CartController
   end
 
   def remove(id)
-    @products_in_cart.delete id
+    if @products_in_cart.delete id
+      products_count == 1 ? @cart.delete : true
+    else
+      false
+    end
   end
 
   private

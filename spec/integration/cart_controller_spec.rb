@@ -32,5 +32,7 @@ describe "In integration" do
   end
 
   xit "is deleted when the last product is deleted" do
+    cart_controller.remove id: 24
+    expect(cart_controller.products_count).to eq 0
   end
 end
