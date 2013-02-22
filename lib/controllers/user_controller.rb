@@ -1,4 +1,4 @@
-class CurrentUser
+class UserController
   attr_reader :type
 
   def initialize(special_meanings, privileges, user_type_inheritance_inherit_previous)

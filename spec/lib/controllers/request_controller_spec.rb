@@ -1,4 +1,4 @@
-describe "Controller" do
+describe "RequestController" do
   let(:pipe) { double }
   let(:product_list_page) { double }
   let(:user) { double }
@@ -7,7 +7,7 @@ describe "Controller" do
   let(:user_create_operation) { double }
   subject(:controller) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-    Controller.new
+    RequestController.new
   end
 
   before :all do
@@ -21,14 +21,14 @@ describe "Controller" do
     stub_const "ProductDetailsPage", Class.new
     stub_const "UserUpdateOperation", Class.new
     stub_const "UserCreateOperation", Class.new
-    stub_const "CurrentUser", Class.new
+    stub_const "UserController", Class.new
 
     Pipe.stub(:new) { pipe }
     ProductListPage.stub(:new) { product_list_page }
     ProductDetailsPage.stub(:new) { product_details_page }
     UserUpdateOperation.stub(:new) { user_update_operation }
     UserCreateOperation.stub(:new) { user_create_operation }
-    CurrentUser.stub(:new).with(kind_of(Hash), kind_of(Hash), kind_of(Array)) { user }
+    UserController.stub(:new).with(kind_of(Hash), kind_of(Hash), kind_of(Array)) { user }
   end
 
   it "gives action log" do

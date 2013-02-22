@@ -40,8 +40,9 @@ class LibPaths
                         'pages_for_data_objects/cart_update_operation',
                         'pages_for_data_objects/cart_delete_operation',
 
-                        'current_user',
-                        'controller',
+                        'controllers/request_controller',
+                        'controllers/user_controller',
+                        'controllers/cart_controller',
                       ]
     @absolute_paths = @relative_paths.map { |relative_path| @root_path + relative_path + ".rb" }
   end

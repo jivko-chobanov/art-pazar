@@ -1,7 +1,7 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
 describe "In integration" do
-  let(:controller) { Controller.new }
+  let(:controller) { RequestController.new }
 
   context "registered" do
     it "gets cart page html" do

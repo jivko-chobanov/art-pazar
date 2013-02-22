@@ -1,9 +1,9 @@
-describe "CurrentCart" do
+describe "CartController" do
   let(:pipe) { double }
   let(:cart) { double }
   subject(:visitor) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
-    CurrentCart.new
+    CartController.new
   end
 
   before :all do

@@ -1,10 +1,10 @@
-class Controller
+class RequestController
   def initialize
     @pipe = Pipe.new
   end
 
   def action(action_name, data_object_name, additional_hash_args_for_action = {})
-    user = CurrentUser.new({
+    user = UserController.new({
         see: [:list, :details],
         create: [:create, :blank_for_create],
         update: [:update, :blank_for_update],

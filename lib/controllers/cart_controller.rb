@@ -1,4 +1,4 @@
-class CurrentCart
+class CartController
   def initialize(first_product)
     @pipe, @cart, @products = Pipe.new, Main::Carts.new, [first_product]
   end

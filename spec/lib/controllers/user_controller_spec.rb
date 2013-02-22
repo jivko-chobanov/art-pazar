@@ -1,4 +1,4 @@
-describe "CurrentUser" do
+describe "UserController" do
   let(:pipe) { double }
   let(:user) { double }
   subject(:visitor) do
@@ -20,7 +20,7 @@ describe "CurrentUser" do
       user.should_receive(:type).and_return type
       user.should_receive(:id).and_return 14
     end
-    CurrentUser.new({
+    UserController.new({
         see: [:list, :details],
         create: [:create, :blank_for_create],
         update: [:update, :blank_for_update],
