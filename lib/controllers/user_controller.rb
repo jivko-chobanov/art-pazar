@@ -64,11 +64,14 @@ class UserController
 
   def login
     username_and_password = @pipe.get :params, names: [:username, :password]
-    user_hash = @pipe.get :runtime_table_hashes, {
-      attribute_group: :for_login,
+    array_of_one_user_hash = @pipe.get :runtime_table_hashes, {
+      data_obj_name: @user.data_obj_name,
+      attributes: @user.attributes_of(:for_login),
       username: username_and_password[:username],
       password: username_and_password[:password],
+      limit: 1,
     }
+    user_hash = array_of_one_user_hash.first
     unless user_hash.empty?
       save_in_user user_hash
       @pipe.put :successful_authentication_in_session, {

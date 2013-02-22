@@ -6,6 +6,7 @@ module Main
         details_for_registered: [:name, :surname, :type],
         for_update: [:id, :name, :surname],
         for_create: [:name, :surname, :username, :password],
+        for_login: [:username, :password, :type],
       )
       super pipe
     end

@@ -91,8 +91,15 @@ describe "UserController" do
       user_hash = {username: "un", password: "pass", id: 14, type: :registered}
       pipe.should_receive(:get).with(:params, names: [:username, :password])
         .and_return username: "un", password: "pass"
-      pipe.should_receive(:get).with(:runtime_table_hashes,
-        {attribute_group: :for_login, username: "un", password: "pass"}).and_return user_hash
+      user.should_receive(:data_obj_name).with(no_args).and_return "User"
+      user.should_receive(:attributes_of).with(:for_login).and_return "for login"
+      pipe.should_receive(:get).with(:runtime_table_hashes, {
+        data_obj_name: "User",
+        attributes: "for login",
+        username: "un",
+        password: "pass",
+        limit: 1,
+      }).and_return [user_hash]
       user.should_receive(:set).with(user_hash)
       user.should_receive(:id).and_return 14
       user.should_receive(:type).and_return :registered
@@ -105,9 +112,11 @@ describe "UserController" do
     it "false if wrong input" do
       pipe.should_receive(:get).with(:params, names: [:username, :password])
         .and_return username: "wrong un", password: "wrong pass"
+      user.should_receive(:data_obj_name).with(no_args).and_return "User"
+      user.should_receive(:attributes_of).with(:for_login).and_return  "for login"
       pipe.should_receive(:get).with(:runtime_table_hashes,
-        {attribute_group: :for_login, username: "wrong un", password: "wrong pass"})
-        .and_return({})
+        {data_obj_name: "User", attributes: "for login", username: "wrong un", password: "wrong pass", limit: 1})
+        .and_return([{}])
       expect(visitor.login).to be_false
       expect(visitor.type).to eq :visitor
     end
