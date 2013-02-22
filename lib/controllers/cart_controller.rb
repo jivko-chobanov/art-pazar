@@ -1,13 +1,26 @@
 class CartController
-  def initialize(first_product)
-    @pipe, @cart, @products = Pipe.new, Main::Carts.new, [first_product]
+  def initialize
+    @pipe, @cart = Pipe.new, Main::Carts.new(:single)
+    @products = Main::ProductsInCart.new
+    add_product_or_raise
+    @cart.load_and_create
   end
+
+  def add_product_from_params
+    add_product_or_raise
+  end
+
+  def products_count
+    @products.size
+  end
+
+# def
 
   private
 
-  def save_in_cart(cart_hash)
-    @cart.set cart_hash
-    @type = @cart.type
-    @id = @cart.id
+  def add_product_or_raise
+    unless @products.load_and_create
+      raise "Cannot add product from params into the cart."
+    end
   end
 end

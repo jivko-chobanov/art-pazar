@@ -15,7 +15,7 @@ class CartBlankForUpdatePage < Page
   def html
     super do
       @pipe.get(:html_for_update, data_by_type: {
-        @cart.data_obj_name => @cart.loaded_as_hashes,
+        @cart.data_obj_name => @cart.loaded_to_hashes,
       })
     end
   end

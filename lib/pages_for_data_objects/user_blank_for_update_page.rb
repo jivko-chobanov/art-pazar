@@ -15,7 +15,7 @@ class UserBlankForUpdatePage < Page
   def html
     super do
       @pipe.get(:html_for_update, data_by_type: {
-        @user.data_obj_name => @user.loaded_as_hashes,
+        @user.data_obj_name => @user.loaded_to_hashes,
       })
     end
   end

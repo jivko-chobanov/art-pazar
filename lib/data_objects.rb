@@ -49,7 +49,7 @@ class DataObjects
     end
 
     def get_or_check_attributes_for_update(attributes)
-      if attributes.nil? then attributes = @runtime_table.row.as_hash end
+      if attributes.nil? then attributes = @runtime_table.row.to_hash end
       unless attributes.include? :id
         raise "Cannot update without an id"
       end
@@ -57,7 +57,7 @@ class DataObjects
     end
 
     def get_or_check_attributes_for_create(attributes)
-      if attributes.nil? then attributes = @runtime_table.row.as_hash end
+      if attributes.nil? then attributes = @runtime_table.row.to_hash end
       if attributes.include? :id
         raise "Cannot create with an id"
       end
@@ -93,9 +93,9 @@ class DataObjects
       put_to_runtime_table @pipe.get(:runtime_table_hashes, needs)
     end
 
-    def loaded_as_hashes
+    def loaded_to_hashes
       must_be_loaded_then do
-        @runtime_table.as_hashes
+        @runtime_table.to_hashes
       end
     end
 
@@ -125,13 +125,13 @@ class DataObjects
   module HTML
     def html
       must_be_loaded_then do
-        @pipe.get :html, data_by_type: {data_obj_name => @runtime_table.as_hashes}
+        @pipe.get :html, data_by_type: {data_obj_name => @runtime_table.to_hashes}
       end
     end
 
     def html_for_update
       must_be_loaded_then do
-        @pipe.get :html_for_update, data_by_type: @runtime_table.as_hashes
+        @pipe.get :html_for_update, data_by_type: @runtime_table.to_hashes
       end
     end
 

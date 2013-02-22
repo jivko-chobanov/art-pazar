@@ -15,8 +15,8 @@ describe "ProductDetailsPage" do
   end
 
   def html_prepare_fakes
-    product.stub(:loaded_as_hashes).and_return ["data1"]
-    product_specifications.stub(:loaded_as_hashes).and_return ["data2"]
+    product.stub(:loaded_to_hashes).and_return ["data1"]
+    product_specifications.stub(:loaded_to_hashes).and_return ["data2"]
     product.stub(:data_obj_name).and_return "Products"
     product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
     pipe.stub(:get).with(:html, data_by_type: {

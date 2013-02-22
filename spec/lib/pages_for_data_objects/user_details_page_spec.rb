@@ -11,7 +11,7 @@ describe "UserDetailsPage" do
   end
 
   def html_prepare_fakes
-    user.stub(:loaded_as_hashes).and_return ["data1"]
+    user.stub(:loaded_to_hashes).and_return ["data1"]
     user.stub(:data_obj_name).and_return "Users"
     pipe.stub(:get).with(:html, data_by_type: {
       "Users" => ["data1"],

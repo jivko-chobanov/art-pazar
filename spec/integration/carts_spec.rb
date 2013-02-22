@@ -11,8 +11,8 @@ describe "In integration" do
 "HTML for Carts
 
 Carts:
-ID  BUYER_ID  SELLER_ID  STATUS
-0   0         0          status value (0)
+ID  BUYER_ID  SELLER_ID
+0   0         0
 ")
     end
 
@@ -23,7 +23,7 @@ ID  BUYER_ID  SELLER_ID  STATUS
 "HTML for creating Carts with fields:
 
 Carts:
-buyer_id, seller_id, status
+buyer_id, seller_id
 ")
     end
 
@@ -33,9 +33,9 @@ buyer_id, seller_id, status
       expect(controller.action :create, :cart).to eq true
       expect(controller.logs).to eq(
         ["Got params: buyer_id_C = buyer_id_C param val, " <<
-          "seller_id_C = seller_id_C param val, status_C = status_C param val",
+          "seller_id_C = seller_id_C param val",
         "Carts creates buyer_id to buyer_id_C param val, " <<
-          "seller_id to seller_id_C param val, status to status_C param val."]
+          "seller_id to seller_id_C param val."]
       )
     end
 
@@ -46,7 +46,7 @@ buyer_id, seller_id, status
 %q{HTML for updating Carts fields:
 
 Carts:
-id was "0", buyer_id was "0", seller_id was "0", status was "status value (0)"
+id was "0", buyer_id was "0", seller_id was "0"
 })
     end
 
@@ -56,9 +56,9 @@ id was "0", buyer_id was "0", seller_id was "0", status was "status value (0)"
       expect(controller.action :update, :cart).to eq true
       expect(controller.logs).to eq(
         ["Got params: id_C = id_C param val, buyer_id_C = buyer_id_C param val, " <<
-          "seller_id_C = seller_id_C param val, status_C = status_C param val",
+          "seller_id_C = seller_id_C param val",
         "Id id_C param val of Carts updates buyer_id to buyer_id_C param val, " <<
-          "seller_id to seller_id_C param val, status to status_C param val."]
+          "seller_id to seller_id_C param val."]
       )
     end
 
@@ -82,17 +82,17 @@ id was "0", buyer_id was "0", seller_id was "0", status was "status value (0)"
       expect(controller.action :list, :cart).to eq "HTML for Carts
 
 Carts:
-ID  BUYER_ID  SELLER_ID  STATUS
-0   0         0          status value (0)
-1   1         1          status value (1)
-2   2         2          status value (2)
-3   3         3          status value (3)
-4   4         4          status value (4)
-5   5         5          status value (5)
-6   6         6          status value (6)
-7   7         7          status value (7)
-8   8         8          status value (8)
-9   9         9          status value (9)
+ID  BUYER_ID  SELLER_ID
+0   0         0
+1   1         1
+2   2         2
+3   3         3
+4   4         4
+5   5         5
+6   6         6
+7   7         7
+8   8         8
+9   9         9
 "
     end
   end

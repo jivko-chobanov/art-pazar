@@ -15,6 +15,7 @@ class LibPaths
                         'data_objects/product_specifications',
                         'data_objects/users',
                         'data_objects/carts',
+                        'data_objects/products_in_cart',
 
                         'pages_for_data_objects/product_list_page',
                         'pages_for_data_objects/product_details_page',

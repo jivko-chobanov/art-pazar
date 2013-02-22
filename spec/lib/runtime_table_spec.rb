@@ -37,7 +37,7 @@ describe "RuntimeTable" do
     end
 
     it "gives cells by column" do
-      expect(johns_row.as_hash).to eq name: "John", age: 22
+      expect(johns_row.to_hash).to eq name: "John", age: 22
     end
   end
 
@@ -50,7 +50,7 @@ describe "RuntimeTable" do
 
       it "if 0 rows creates empty Row" do
         zero_rows_table = RuntimeTable.new
-        expect(zero_rows_table.row.as_hash).to eq({})
+        expect(zero_rows_table.row.to_hash).to eq({})
       end
 
       it "if many rows" do
@@ -63,12 +63,12 @@ describe "RuntimeTable" do
     end
 
     it "adds rows on initialization and gives them as hashes" do
-      expect(people_s_table.as_hashes).to eq [{name: "John", age: 22}, {name: "Ana", age: 19}]
+      expect(people_s_table.to_hashes).to eq [{name: "John", age: 22}, {name: "Ana", age: 19}]
     end
 
     it "adds new rows" do
       people_s_table << [{name: "Peg", age: 44}]
-      expect(people_s_table.as_hashes).to eq(
+      expect(people_s_table.to_hashes).to eq(
         [{name: "John", age: 22}, {name: "Ana", age: 19}, {name: "Peg", age: 44}])
     end
 

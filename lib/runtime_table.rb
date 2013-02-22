@@ -13,7 +13,7 @@ class RuntimeTable
       @cells_by_column.keys
     end
 
-    def as_hash
+    def to_hash
       @cells_by_column
     end
 
@@ -37,8 +37,8 @@ class RuntimeTable
     self << array_of_values_by_column_name
   end
 
-  def as_hashes
-    @rows.map(&:as_hash)
+  def to_hashes
+    @rows.map(&:to_hash)
   end
 
   def <<(array_of_values_by_column_name)

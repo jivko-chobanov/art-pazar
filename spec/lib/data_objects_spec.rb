@@ -65,8 +65,7 @@ describe "DataObjects" do
   end
 
   it "initializes with given pipe" do
-    data_objects = DataObjects.new(Pipe.new)
-    expect(data_objects.instance_variable_get :@pipe).to eq pipe
+    expect { DataObjects.new(Pipe.new) }.not_to raise_error RuntimeError
   end
 
   it "gives attributes of attribute groups" do
@@ -82,14 +81,14 @@ describe "DataObjects" do
   end
 
   it "gives loaded data as hash" do
-    expect { data_objects.loaded_as_hashes }.to raise_error RuntimeError
+    expect { data_objects.loaded_to_hashes }.to raise_error RuntimeError
 
     load_with_args :load_from_db, data_objects, {attribute_group: :list, limit: 2},
       [:runtime_table_hashes,
         {attributes: [:name, :price], limit: 2, data_obj_name: "DataObjects"}]
 
-    runtime_table.stub(:as_hashes).and_return "content got by pipe to hash"
-    expect(data_objects.loaded_as_hashes).to eq "content got by pipe to hash"
+    runtime_table.stub(:to_hashes).and_return "content to hash"
+    expect(data_objects.loaded_to_hashes).to eq "content to hash"
   end
 
   it "gives information about data" do
@@ -207,7 +206,7 @@ describe "DataObjects" do
 
     it "from loaded data" do
       attributes = {name: "new name", price: 3.10}
-      row.stub(:as_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -220,7 +219,7 @@ describe "DataObjects" do
       attributes = {name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_create},
         [:params, {names: attributes.keys}]
-      row.stub(:as_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -242,7 +241,7 @@ describe "DataObjects" do
 
     it "from loaded data" do
       attributes = {id: 14, name: "new name", price: 3.10}
-      row.stub(:as_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -253,7 +252,7 @@ describe "DataObjects" do
       attributes = {id: 18, name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_update},
         [:params, {names: attributes.keys}]
-      row.stub(:as_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args()).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -276,7 +275,7 @@ describe "DataObjects" do
 
       data_objects.load_from_db attribute_group: :list, limit: 5
 
-      runtime_table.stub(:as_hashes).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hashes).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html, data_by_type: {"DataObjects" => "loaded data to hash"})
         .and_return "html got by pipe"
 
@@ -288,7 +287,7 @@ describe "DataObjects" do
         [:runtime_table_hashes,
           {attributes: [:name, :category_id, :price], limit: 1, data_obj_name: "DataObjects"}]
 
-      runtime_table.stub(:as_hashes).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hashes).with(no_args()).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html_for_update, data_by_type: "loaded data to hash")
         .and_return "html got by pipe"
       expect(data_objects.html_for_update).to eq "html got by pipe"
