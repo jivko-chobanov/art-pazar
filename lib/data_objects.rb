@@ -1,19 +1,24 @@
 class DataObjects
   module Actions
     def create(attributes = nil)
-      attributes = get_or_check_attributes_for_create attributes
+      attributes = get_attributes_and_make_row_under_construction attributes
+      attributes = check_attributes_for_create attributes
+
       success = put_to_pipe attributes
-      @runtime_table.row << {id: @pipe.get(:last_created_id, data_obj_name: data_obj_name)}
+      @runtime_table.complete_the_row_under_construction(
+        id: @pipe.get(:last_created_id, data_obj_name: data_obj_name)
+      )
       success
     end
 
     def load_and_create
-      load_from_params attribute_group: :for_create
+      load_from_params in_row_under_construction: true, attribute_group: :for_create
       create
     end
 
     def update(attributes = nil)
-      attributes = get_or_check_attributes_for_update attributes
+      if attributes.nil? then attributes = @runtime_table.row.to_hash end
+      attributes = check_attributes_for_update attributes
       put_to_pipe attributes
     end
 
@@ -34,6 +39,18 @@ class DataObjects
 
     private
 
+    def get_attributes_and_make_row_under_construction(attributes)
+      if attributes.nil?
+        unless @runtime_table.has_row_under_construction?
+          @runtime_table.make_row_under_construction
+        end
+        @runtime_table.row_under_construction.to_hash
+      else
+        @runtime_table.row_under_construction attributes
+        attributes
+      end
+    end
+
     def id_or_hash_or_nil_to_hash_for_delete(id_or_hash_or_nil)
       attribute_by_name = {}
       if id_or_hash_or_nil.nil? and @runtime_table.row.respond_to? :id
@@ -48,19 +65,17 @@ class DataObjects
       attribute_by_name
     end
 
-    def get_or_check_attributes_for_update(attributes)
-      if attributes.nil? then attributes = @runtime_table.row.to_hash end
+    def check_attributes_for_update(attributes)
+      if attributes.nil? then raise "Cannot update with nil attributes" end
       unless attributes.include? :id
         raise "Cannot update without an id"
       end
       attributes
     end
 
-    def get_or_check_attributes_for_create(attributes)
-      if attributes.nil? then attributes = @runtime_table.row.to_hash end
-      if attributes.include? :id
-        raise "Cannot create with an id"
-      end
+    def check_attributes_for_create(attributes)
+      if attributes.nil? then raise "Cannot create with nil attributes" end
+      if attributes.include?(:id) then raise "Cannot create with an id" end
 
       unless (attributes_of(:for_create) - attributes.keys).empty?
         raise "Attributes #{attributes.keys.join ", "} must also contain #{
@@ -79,7 +94,8 @@ class DataObjects
       needs[:names] = attributes_of needs[:attribute_group], suffix_to_be_added: suffix
       needs.delete :attribute_group
 
-      put_to_runtime_table Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix)
+      put_to_runtime_table Support.remove_suffix_from_keys(@pipe.get(:params, needs), suffix),
+        needs
     end
 
     def load_from_db(needs)
@@ -180,9 +196,13 @@ class DataObjects
     @pipe.put data_obj_name, attributes
   end
 
-  def put_to_runtime_table(rows_as_hashes_or_row_as_hash)
-    rows_as_hashes = to_rows_as_hashes rows_as_hashes_or_row_as_hash
-    @runtime_table << rows_as_hashes
+  def put_to_runtime_table(rows_as_hashes_or_row_as_hash, options = {})
+    if options.include? :in_row_under_construction
+      @runtime_table.row_under_construction << rows_as_hashes_or_row_as_hash
+    else
+      rows_as_hashes = to_rows_as_hashes rows_as_hashes_or_row_as_hash
+      @runtime_table << rows_as_hashes
+    end
   end
 
   def to_rows_as_hashes(rows_as_hashes_or_row_as_hash)

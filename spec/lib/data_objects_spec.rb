@@ -2,6 +2,7 @@ describe "DataObjects" do
   let(:data_object_attribute_groups) { double put: nil }
   let(:runtime_table) { double }
   let(:row) { double }
+  let(:row_under_construction) { double }
   let(:pipe) { double }
   subject(:data_objects) do
     require __FILE__.sub('/spec/', '/').sub('_spec.rb', '.rb')
@@ -34,7 +35,11 @@ describe "DataObjects" do
       .and_return "content got by pipe"
     Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
       .and_return "content got by pipe"
-    runtime_table.should_receive(:<<).with ["content got by pipe"]
+    if args_for_load.include? :in_row_under_construction
+      row_under_construction.should_receive(:<<).with "content got by pipe"
+    else
+      runtime_table.should_receive(:<<).with ["content got by pipe"]
+    end
   end
 
   def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
@@ -61,7 +66,8 @@ describe "DataObjects" do
 
     RuntimeTable.stub(:new) { runtime_table }
     Pipe.stub(:new) { pipe }
-    runtime_table.stub(:row).with(no_args()).and_return row
+    runtime_table.stub(:row).with(no_args).and_return row
+    runtime_table.stub(:row_under_construction).with(no_args).and_return row_under_construction
   end
 
   it "initializes with given pipe" do
@@ -139,6 +145,12 @@ describe "DataObjects" do
           {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
     end
 
+    it "into row under construction" do
+      load_with_args :load_from_params, data_objects,
+        {in_row_under_construction: true, attribute_group: :for_update},
+        [:params, {in_row_under_construction: true, names: [:name, :price]}]
+    end
+
     context "raises errors" do
       it "when attribute_group is missing when loading from database" do
         expect { data_objects.load_from_db limit: 1 }.to raise_error RuntimeError
@@ -199,44 +211,83 @@ describe "DataObjects" do
   end
 
   context "creates" do
-    it "from given attributes" do
-      attributes = {id: 12, name: "new name", price: 3.10}
-      expect { new_data_objects.create attributes }.to raise_error RuntimeError
+    context "from given attributes" do
+      context "when wrong" do
+        it "(id exists)" do
+          attributes = {id: 12, name: "new name", price: 3.10}
+          runtime_table.should_receive(:row_under_construction).with(attributes)
+          expect { new_data_objects.create attributes }.to raise_error RuntimeError
+        end
 
-      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
-        .and_return [:valid_attribute1, :v_a2]
-      expect { new_data_objects.create name: "valid" }.to raise_error RuntimeError
+        it "(not match attribute group for_create)" do
+          data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+            .and_return [:valid_attribute1, :v_a2]
+          runtime_table.should_receive(:row_under_construction).with(name: "valid")
+          expect { new_data_objects.create name: "valid" }.to raise_error RuntimeError
+        end
 
-      attributes = {name: "new name", price: 3.10}
-      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
-        .and_return attributes.keys
-      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
-      pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      row.should_receive(:<<).with id: 24
-      expect(new_data_objects.create attributes).to be_true
+        it "(no attributes are given)" do
+          runtime_table.should_receive(:has_row_under_construction?).with(no_args).and_return false
+          runtime_table.stub(:make_row_under_construction).with(no_args)
+          runtime_table.should_receive(:row_under_construction).with(no_args).and_raise RuntimeError
+          expect { new_data_objects.create }.to raise_error RuntimeError
+        end
+      end
+
+      it "when ok" do
+        attributes = {name: "new name", price: 3.10}
+        runtime_table.should_receive(:row_under_construction).with(attributes)
+        data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+          .and_return attributes.keys
+
+        pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+        pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+        runtime_table.should_receive(:complete_the_row_under_construction).with id: 24
+        expect(new_data_objects.create attributes).to be_true
+      end
     end
 
-    it "from loaded data" do
-      attributes = {name: "new name", price: 3.10}
-      row.stub(:to_hash).with(no_args()).and_return attributes
-      data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
-        .and_return attributes.keys
-      pipe.should_receive(:put).with("DataObjects", attributes).and_return true
-      pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      row.should_receive(:<<).with id: 24
-      expect(new_data_objects.create).to be_true
+    context "from loaded data" do
+      it "in single row" do
+        attributes = {name: "new name", price: 3.10}
+        runtime_table.stub(:has_row_under_construction?).with(no_args).and_return false
+        runtime_table.stub(:make_row_under_construction).with(no_args)
+        row_under_construction.stub(:to_hash).with(no_args).and_return attributes
+        data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+          .and_return attributes.keys
+
+        pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+        pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+        runtime_table.should_receive(:complete_the_row_under_construction).with id: 24
+        expect(new_data_objects.create).to be_true
+      end
+
+      it "loaded in row under construction" do
+        attributes = {name: "new name", price: 3.10}
+        runtime_table.stub(:has_row_under_construction?).with(no_args).and_return true
+        row_under_construction.should_receive(:to_hash).and_return attributes
+        data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
+          .and_return attributes.keys
+
+        pipe.should_receive(:put).with("DataObjects", attributes).and_return true
+        pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
+        runtime_table.should_receive(:complete_the_row_under_construction).with id: 24
+        expect(new_data_objects.create).to be_true
+      end
     end
 
     it "loads and creates in one step" do
       attributes = {name: "new name", price: 3.10}
-      prep_load_from_params data_objects, {attribute_group: :for_create},
-        [:params, {names: attributes.keys}]
-      row.stub(:to_hash).with(no_args()).and_return attributes
+      prep_load_from_params data_objects, {in_row_under_construction: true, attribute_group: :for_create},
+        [:params, {in_row_under_construction: true, names: attributes.keys}]
+
+      runtime_table.stub(:has_row_under_construction?).with(no_args).and_return true
+      row_under_construction.stub(:to_hash).with(no_args).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_create, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
       pipe.should_receive(:get).with(:last_created_id, data_obj_name: "DataObjects").and_return 24
-      row.should_receive(:<<).with id: 24
+      runtime_table.should_receive(:complete_the_row_under_construction).with id: 24
       expect(new_data_objects.load_and_create).to be_true
     end
   end
@@ -251,9 +302,14 @@ describe "DataObjects" do
       expect(data_objects.update attributes).to be_true
     end
 
+    it "raises error when no attributes are given" do
+      runtime_table.should_receive(:row).with(no_args).and_raise RuntimeError
+      expect { new_data_objects.update }.to raise_error RuntimeError
+    end
+
     it "from loaded data" do
       attributes = {id: 14, name: "new name", price: 3.10}
-      row.stub(:to_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -264,7 +320,7 @@ describe "DataObjects" do
       attributes = {id: 18, name: "new name", price: 3.10}
       prep_load_from_params data_objects, {attribute_group: :for_update},
         [:params, {names: attributes.keys}]
-      row.stub(:to_hash).with(no_args()).and_return attributes
+      row.stub(:to_hash).with(no_args).and_return attributes
       data_object_attribute_groups.stub(:attributes_of).with(:for_update, {})
         .and_return attributes.keys
       pipe.should_receive(:put).with("DataObjects", attributes).and_return true
@@ -287,7 +343,7 @@ describe "DataObjects" do
 
       data_objects.load_from_db attribute_group: :list, limit: 5
 
-      runtime_table.stub(:to_hashes).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hashes).with(no_args).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html, data_by_type: {"DataObjects" => "loaded data to hash"})
         .and_return "html got by pipe"
 
@@ -299,7 +355,7 @@ describe "DataObjects" do
         [:runtime_table_hashes,
           {attributes: [:name, :category_id, :price], limit: 1, data_obj_name: "DataObjects"}]
 
-      runtime_table.stub(:to_hashes).with(no_args()).and_return "loaded data to hash"
+      runtime_table.stub(:to_hashes).with(no_args).and_return "loaded data to hash"
       pipe.should_receive(:get).with(:html_for_update, data_by_type: "loaded data to hash")
         .and_return "html got by pipe"
       expect(data_objects.html_for_update).to eq "html got by pipe"
