@@ -34,7 +34,7 @@ describe "DataObjects" do
       .and_return "content got by pipe"
     Support.should_receive(:remove_suffix_from_keys).with("content got by pipe", "_Pr")
       .and_return "content got by pipe"
-    row.should_receive(:<<).with "content got by pipe"
+    runtime_table.should_receive(:<<).with ["content got by pipe"]
   end
 
   def load_with_args(load_method, data_objects, args_for_load, expected_args_for_pipe)
@@ -127,12 +127,24 @@ describe "DataObjects" do
           {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
     end
 
+    it "many times from anywhere" do
+      load_with_args :load_from_params, data_objects,
+        {attribute_group: :for_update},
+        [:params, {names: [:name, :price]}]
+      load_with_args :load_from_params, data_objects,
+        {attribute_group: :for_update},
+        [:params, {names: [:name, :price]}]
+      load_with_args :load_from_db, data_objects, {attribute_group: :for_update, limit: 1},
+        [:runtime_table_hashes,
+          {attributes: [:name, :price], limit: 1, data_obj_name: "DataObjects"}]
+    end
+
     context "raises errors" do
-      it "from database" do
+      it "when attribute_group is missing when loading from database" do
         expect { data_objects.load_from_db limit: 1 }.to raise_error RuntimeError
       end
 
-      it "from params" do
+      it "when attribute_group is missing when loading from params" do
         expect { data_objects.load_from_params any_key: :any_val }.to raise_error RuntimeError
       end
     end

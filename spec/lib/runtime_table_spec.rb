@@ -66,10 +66,18 @@ describe "RuntimeTable" do
       expect(people_s_table.to_hashes).to eq [{name: "John", age: 22}, {name: "Ana", age: 19}]
     end
 
-    it "adds new rows" do
-      people_s_table << [{name: "Peg", age: 44}]
-      expect(people_s_table.to_hashes).to eq(
-        [{name: "John", age: 22}, {name: "Ana", age: 19}, {name: "Peg", age: 44}])
+    context "adds new rows" do
+      it "when ok" do
+        people_s_table << [{name: "Peg", age: 44}]
+        expect(people_s_table.to_hashes).to eq(
+          [{name: "John", age: 22}, {name: "Ana", age: 19}, {name: "Peg", age: 44}])
+      end
+
+      it "when different attributes - raises error" do
+        expect { people_s_table << [{name: "Peg", age: 44, other: 2}] }.to raise_error RuntimeError
+        expect { people_s_table << [{name: "Peg", other: 44}] }.to raise_error RuntimeError
+        expect { people_s_table << [{name: "Peg"}] }.to raise_error RuntimeError
+      end
     end
 
     it "checks emptines" do

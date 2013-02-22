@@ -42,7 +42,9 @@ class RuntimeTable
   end
 
   def <<(array_of_values_by_column_name)
-    @rows = @rows + to_rows(array_of_values_by_column_name)
+    must_be_compatible_then(array_of_values_by_column_name) do
+      @rows = @rows + to_rows(array_of_values_by_column_name)
+    end
   end
 
   def empty?
@@ -68,6 +70,23 @@ class RuntimeTable
   end
 
   private
+
+  def must_be_compatible_then(array_of_values_by_column_name)
+    if compatible?(array_of_values_by_column_name)
+      yield
+    else
+      raise "Array of values by column name is not compatible to the contents of the runtime table.\n" <<
+      "Array: #{array_of_values_by_column_name} ----- Table: #{to_hashes}"
+    end
+  end
+
+  def compatible?(array_of_values_by_column_name)
+    return true if empty?
+
+    array_of_values_by_column_name.all? do |values_by_column_name|
+      column_names.sort == values_by_column_name.keys.sort
+    end
+  end
 
   def rows_count
     @rows.count

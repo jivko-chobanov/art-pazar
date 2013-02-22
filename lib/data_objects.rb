@@ -180,11 +180,16 @@ class DataObjects
     @pipe.put data_obj_name, attributes
   end
 
-  def put_to_runtime_table(rows_or_hash_to_the_row)
-    if rows_or_hash_to_the_row.is_a? Array
-      @runtime_table << rows_or_hash_to_the_row
+  def put_to_runtime_table(rows_as_hashes_or_row_as_hash)
+    rows_as_hashes = to_rows_as_hashes rows_as_hashes_or_row_as_hash
+    @runtime_table << rows_as_hashes
+  end
+
+  def to_rows_as_hashes(rows_as_hashes_or_row_as_hash)
+    if rows_as_hashes_or_row_as_hash.is_a? Array
+      rows_as_hashes = rows_as_hashes_or_row_as_hash
     else
-      @runtime_table.row << rows_or_hash_to_the_row
+      rows_as_hashes = [rows_as_hashes_or_row_as_hash]
     end
   end
 
