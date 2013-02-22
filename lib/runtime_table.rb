@@ -30,7 +30,32 @@ class RuntimeTable
     end
   end
 
+  module RowUnderConstruction
+    attr_reader :row_under_construction
+
+    def has_row_under_construction?
+      !!@row_under_construction
+    end
+
+    def make_row_under_construction
+      if empty?
+        raise "There is no row to be made row under construction."
+      elsif has_row_under_construction?
+        raise "There already is one row under construction."
+      else
+        @row_under_construction = @rows.pop
+      end
+    end
+
+    def complete_the_row_under_construction(attributes_by_name_for_completion)
+      @row_under_construction << attributes_by_name_for_completion
+      @rows << @row_under_construction
+      @row_under_construction = nil
+    end
+  end
+
   include Enumerable
+  include RowUnderConstruction
 
   def initialize(array_of_values_by_column_name = [])
     @rows = []

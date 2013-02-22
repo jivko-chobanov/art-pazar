@@ -80,6 +80,45 @@ describe "RuntimeTable" do
       end
     end
 
+    context "works with row under construction" do
+      it "checks if such exists" do
+        expect(runtime_table.has_row_under_construction?).to be_false
+        expect(people_s_table.has_row_under_construction?).to be_false
+
+        runtime_table << [{name: "John", age: 22}]
+        runtime_table.make_row_under_construction
+        expect(runtime_table.has_row_under_construction?).to be_true
+      end
+
+      it "makes it" do
+        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+
+        runtime_table << [{name: "John", age: 22}]
+        runtime_table.make_row_under_construction
+
+        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+
+        runtime_table << [{name: "John", age: 22}]
+        expect { runtime_table.make_row_under_construction }.to raise_error RuntimeError
+      end
+
+      it "gets it" do
+        runtime_table << [{name: "John", age: 22}]
+        old_row = runtime_table.row
+        runtime_table.make_row_under_construction
+        expect(runtime_table.row_under_construction).to be old_row
+      end
+
+      it "completes it" do
+        runtime_table << [{name: "John", age: 22}]
+        runtime_table.make_row_under_construction
+        runtime_table.complete_the_row_under_construction id: 8
+        expect(runtime_table.has_row_under_construction?).to be_false
+        expect(runtime_table.empty?).to be_false
+        expect(runtime_table.row.id).to eq 8
+      end
+    end
+
     it "checks emptines" do
       expect(people_s_table.empty?).to be_false
       expect(runtime_table.empty?).to be_true
