@@ -10,14 +10,14 @@ describe "ProductCreateOperation" do
   def load_from_params_prepare_fakes(type)
     product_specifications.should_receive(:type=).with type
     product.should_receive(:load_from_params).with attribute_group: :for_create
-    product.should_receive(:type).with(no_args()).and_return :paintings
+    product.should_receive(:type).with(no_args).and_return :paintings
     product_specifications.should_receive(:load_from_params)
       .with attribute_group: :for_create, type: :paintings
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:create).with(no_args()).and_return true
-    product.should_receive(:id).with(no_args()).and_return 12
+    product.should_receive(:create).with(no_args).and_return true
+    product.should_receive(:id).with(no_args).and_return 12
     product_specifications.should_receive(:create).with(12).and_return true
   end
 

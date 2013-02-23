@@ -93,8 +93,10 @@ class RuntimeTable
   end
 
   def remove(attribute_by_name)
-    @rows.reject! do |row|
-      row.to_hash[attribute_by_name.keys.first] == attribute_by_name.values.first
+    must_have_row_then do
+      @rows.reject! do |row|
+        row.to_hash[attribute_by_name.keys.first] == attribute_by_name.values.first
+      end
     end
   end
 

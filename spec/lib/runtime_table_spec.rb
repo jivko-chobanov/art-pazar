@@ -19,6 +19,8 @@ describe "RuntimeTable" do
     it "adds named values on initialization and gives values" do
       expect(johns_row.name).to eq "John"
       expect(johns_row.age).to eq 22
+      
+      expect { johns_row.qqq }.to raise_error NoMethodError
     end
 
     it "adds new named values" do
@@ -38,6 +40,7 @@ describe "RuntimeTable" do
 
     it "gives cells by column" do
       expect(johns_row.to_hash).to eq name: "John", age: 22
+      expect(row.to_hash).to eq({})
     end
   end
 
@@ -68,6 +71,10 @@ describe "RuntimeTable" do
 
     context "adds new rows" do
       it "when ok" do
+        zero_rows_table = RuntimeTable.new
+        zero_rows_table << [{name: "Peg", age: 44}]
+        expect(zero_rows_table.to_hashes).to eq [{name: "Peg", age: 44}]
+
         people_s_table << [{name: "Peg", age: 44}]
         expect(people_s_table.to_hashes).to eq(
           [{name: "John", age: 22}, {name: "Ana", age: 22}, {name: "Peg", age: 44}])
@@ -80,12 +87,31 @@ describe "RuntimeTable" do
       end
     end
 
-    it "removes using attribute_by_name" do
-      people_s_table.remove name: "John"
-      expect(people_s_table.rows_count).to eq 1
+    context "removes using attribute_by_name" do
+      it "when only one row matches" do
+        people_s_table.remove name: "John"
+        expect(people_s_table.rows_count).to eq 1
+      end
 
-      people_s_table.remove age: 22
-      expect(people_s_table.rows_count).to eq 0
+      it "when many rows match" do
+        people_s_table.remove age: 22
+        expect(people_s_table.rows_count).to eq 0
+      end
+
+      it "when not existing attribute value" do
+        people_s_table.remove age: 789
+        expect(people_s_table.rows_count).to eq 2
+      end
+
+      it "when not existing attribute name" do
+        people_s_table.remove qqq: 2
+        expect(people_s_table.rows_count).to eq 2
+      end
+
+      it "when empty table" do
+        zero_rows_table = RuntimeTable.new
+        expect { zero_rows_table.remove age: 22 }.to raise_error RuntimeError
+      end
     end
 
     context "works with row under construction" do
@@ -132,6 +158,7 @@ describe "RuntimeTable" do
         expect(runtime_table.has_row_under_construction?).to be_false
         expect(runtime_table.empty?).to be_false
         expect(runtime_table.row.id).to eq 8
+        expect(runtime_table.row.age).to eq 22
       end
     end
 

@@ -12,11 +12,11 @@ describe "ProductBlankForCreatePage" do
   end
 
   def html_prepare_fakes
-    product.stub(:attributes_of).and_return ["attribute names 1"]
-    product_specifications.stub(:attributes_of).and_return ["attribute names 2"]
-    product.stub(:data_obj_name).and_return "Products"
-    product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
-    pipe.stub(:get).with(:html_for_create, data_by_type: {
+    product.should_receive(:attributes_of).and_return ["attribute names 1"]
+    product_specifications.should_receive(:attributes_of).and_return ["attribute names 2"]
+    product.should_receive(:data_obj_name).and_return "Products"
+    product_specifications.should_receive(:data_obj_name).and_return "ProductSpecifications"
+    pipe.should_receive(:get).with(:html_for_create, data_by_type: {
       "Products" => ["attribute names 1"],
       "ProductSpecifications" => ["attribute names 2"]
     }).and_return "HTML for create product page"

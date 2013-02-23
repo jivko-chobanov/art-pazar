@@ -20,9 +20,6 @@ class Pipe
     end
   end
 
-  class MissingNeedOrInputError < RuntimeError
-  end
-
   include Log
 
   def initialize
@@ -305,11 +302,11 @@ class Pipe
     case for_method
       when :get_data
         unless @needs_and_input.include? :limit
-          raise MissingNeedOrInputError, "limit should be included into needs_and_input"
+          raise "limit should be included into needs_and_input"
         end
       when :get_html, :get_html_for_update, :get_html_for_create
         unless @needs_and_input.include? :data_by_type
-          raise MissingNeedOrInputError, "cannot make html without :data_by_type"
+          raise "cannot make html without :data_by_type"
         end
       else
         raise "undefined method #{for_method} in #{__method__}'s case"

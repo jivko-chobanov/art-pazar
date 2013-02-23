@@ -1,12 +1,22 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
-describe "In integration" do
+describe "In integration RequestController works with Products" do
   let(:controller) { RequestController.new }
+
+  def prepare_user_of_type_and_id_of_item(type_or_false_for_empty_session,
+                                          id_from_params_or_false = 14, id = 14)
+    if type_or_false_for_empty_session
+      Pipe::Fake.should_receive(:get_from_session).and_return(
+        id: id, type: type_or_false_for_empty_session)
+    else
+      Pipe::Fake.should_receive(:get_from_session).and_return false
+    end
+    Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return id_from_params_or_false
+  end
 
   context "visitor" do
     it "sees html for products" do
-      Pipe::Fake.should_receive(:get_from_session).and_return false
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item false, false 
       expect(controller.action :list, :product).to eq "HTML for Products
 
 Products:
@@ -25,8 +35,7 @@ name value (9)  14.43
     end
 
     it "gets product page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return false
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item false, 16 
       expect(controller.action :details, :product).to eq(
 "HTML for Products, ProductSpecifications
 
@@ -42,8 +51,7 @@ SMALLINT_1  STRING_1    STRING_2    STRING_3
 
   context "seller" do
     it "gets product create page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item :seller, false 
       expect(controller.action :blank_for_create, :product, product_type: :paintings).to eq(
 "HTML for creating Products, ProductSpecifications with fields:
 
@@ -55,8 +63,7 @@ string_1, smallint_1, string_2, string_3
     end
 
     it "creates product and product specification" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item :seller, false 
       expect(controller.action :create, :product, product_type: :paintings).to eq true
       expect(controller.logs).to eq(
         ["Got params: name_Pr = name_Pr param val, category_id_Pr = category_id_Pr " <<
@@ -73,8 +80,7 @@ string_1, smallint_1, string_2, string_3
     end
 
     it "gets product update page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 16 
       expect(controller.action :blank_for_update, :product).to eq(
 "HTML for updating Products, ProductSpecifications fields:
 
@@ -86,8 +92,7 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
     end
 
     it "updates product and product specification" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 16 
       expect(controller.action :update, :product).to eq true
       expect(controller.logs).to eq(
         ["Got params: id_Pr = id_Pr param val, name_Pr = name_Pr param val, " <<
@@ -104,8 +109,7 @@ id was \"0\", smallint_1 was \"0\", string_1 was \"value1 (0)\", string_2 was \"
     end
 
     it "deletes product" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 16 
       expect(controller.action :delete, :product).to eq true
       expect(controller.logs).to eq(
         ["Products with id = 16 is now deleted.",

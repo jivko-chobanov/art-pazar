@@ -8,18 +8,18 @@ describe "ProductDetailsPage" do
   end
 
   def load_prepare_fakes(id, type)
-    product.stub(:load_from_db).with id: id, attribute_group: :for_visitor, limit: 1
+    product.should_receive(:load_from_db).with id: id, attribute_group: :for_visitor, limit: 1
     product.should_receive(:type).and_return :paintings
-    product_specifications.stub(:load_from_db)
+    product_specifications.should_receive(:load_from_db)
       .with id: id, type: :paintings, attribute_group: :for_visitor, limit: 1
   end
 
   def html_prepare_fakes
-    product.stub(:loaded_to_hashes).and_return ["data1"]
-    product_specifications.stub(:loaded_to_hashes).and_return ["data2"]
-    product.stub(:data_obj_name).and_return "Products"
-    product_specifications.stub(:data_obj_name).and_return "ProductSpecifications"
-    pipe.stub(:get).with(:html, data_by_type: {
+    product.should_receive(:loaded_to_hashes).and_return ["data1"]
+    product_specifications.should_receive(:loaded_to_hashes).and_return ["data2"]
+    product.should_receive(:data_obj_name).and_return "Products"
+    product_specifications.should_receive(:data_obj_name).and_return "ProductSpecifications"
+    pipe.should_receive(:get).with(:html, data_by_type: {
       "Products" => ["data1"],
       "ProductSpecifications" => ["data2"]
     }).and_return "HTML for product page"
@@ -59,10 +59,10 @@ describe "ProductDetailsPage" do
     load_prepare_fakes 14, :paintings
     product_details_page.load 14
 
-    product.stub(:loaded_empty_result?).with(no_args).and_return true
+    product.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(product_details_page.pipe_name_of_txt_if_empty_content).to eq :no_product
 
-    product_details_page.stub(:html).and_return "No product."
+    product_details_page.should_receive(:html).and_return "No product."
     expect(product_details_page.html).to eq "No product."
   end
 end

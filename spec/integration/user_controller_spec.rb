@@ -1,13 +1,13 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
-describe "In integration" do
+describe "In integration UserController" do
   let(:controller) { RequestController.new }
   let(:visitor) { user_of_type :visitor }
   let(:registered) { user_of_type :registered }
   let(:seller) { user_of_type :seller }
   let(:admin) { user_of_type :admin }
 
-  def user_of_type(type, id = 14, id_from_params = 14)
+  def user_of_type(type, id = 14)
     Pipe::Fake.should_receive(:get_from_session).and_return id: id, type: type
     UserController.new({
         see: [:list, :details],
@@ -61,7 +61,7 @@ describe "In integration" do
     end
   end
 
-  context "when logging in" do
+  context "when logged in" do
     it "#login" do
       expect(visitor.login).to be_true
       expect(visitor.type).to eq "type value (0)"

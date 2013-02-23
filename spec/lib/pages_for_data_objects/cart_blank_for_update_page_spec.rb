@@ -7,13 +7,13 @@ describe "CartBlankForUpdatePage" do
   end
 
   def load_from_db_prepare_fakes(id)
-    cart.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
+    cart.should_receive(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
   end
 
   def html_prepare_fakes
-    cart.stub(:loaded_to_hashes).and_return ["data1"]
-    cart.stub(:data_obj_name).and_return "Carts"
-    pipe.stub(:get).with(:html_for_update, data_by_type: {
+    cart.should_receive(:loaded_to_hashes).and_return ["data1"]
+    cart.should_receive(:data_obj_name).and_return "Carts"
+    pipe.should_receive(:get).with(:html_for_update, data_by_type: {
       "Carts" => ["data1"],
     }).and_return "HTML for update cart page"
   end
@@ -39,7 +39,7 @@ describe "CartBlankForUpdatePage" do
       load_from_db_prepare_fakes 12
       cart_blank_for_update_page.load 12
 
-      cart.stub(:loaded_empty_result?).with(no_args).and_return false
+      cart.should_receive(:loaded_empty_result?).with(no_args).and_return false
       expect(cart_blank_for_update_page.pipe_name_of_txt_if_empty_content).to eq false
 
       html_prepare_fakes
@@ -57,10 +57,10 @@ describe "CartBlankForUpdatePage" do
     load_from_db_prepare_fakes 12
     cart_blank_for_update_page.load 12
 
-    cart.stub(:loaded_empty_result?).with(no_args).and_return true
+    cart.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(cart_blank_for_update_page.pipe_name_of_txt_if_empty_content).to eq :no_cart
 
-    cart_blank_for_update_page.stub(:html).and_return "No cart."
+    cart_blank_for_update_page.should_receive(:html).and_return "No cart."
     expect(cart_blank_for_update_page.html).to eq "No cart."
   end
 end

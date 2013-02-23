@@ -7,13 +7,13 @@ describe "UserDetailsPage" do
   end
 
   def load_prepare_fakes(id)
-    user.stub(:load_from_db).with id: id, attribute_group: :details_for_registered, limit: 1
+    user.should_receive(:load_from_db).with id: id, attribute_group: :details_for_registered, limit: 1
   end
 
   def html_prepare_fakes
-    user.stub(:loaded_to_hashes).and_return ["data1"]
-    user.stub(:data_obj_name).and_return "Users"
-    pipe.stub(:get).with(:html, data_by_type: {
+    user.should_receive(:loaded_to_hashes).and_return ["data1"]
+    user.should_receive(:data_obj_name).and_return "Users"
+    pipe.should_receive(:get).with(:html, data_by_type: {
       "Users" => ["data1"],
     }).and_return "HTML for user page"
   end
@@ -50,10 +50,10 @@ describe "UserDetailsPage" do
     load_prepare_fakes 14
     user_details_page.load 14
 
-    user.stub(:loaded_empty_result?).with(no_args).and_return true
+    user.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(user_details_page.pipe_name_of_txt_if_empty_content).to eq :no_user
 
-    user_details_page.stub(:html).and_return "No user."
+    user_details_page.should_receive(:html).and_return "No user."
     expect(user_details_page.html).to eq "No user."
   end
 end

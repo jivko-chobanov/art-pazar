@@ -25,13 +25,13 @@ describe "Page" do
   end
 
   it "raises errors" do
-    page.stub(:pipe_name_of_txt_if_empty_content).and_return false
+    page.should_receive(:pipe_name_of_txt_if_empty_content).and_return false
     page.should_receive(:loaded?).and_return false
     expect { page.html }.to raise_error RuntimeError
   end
 
   it "displays msg if loaded empty content" do
-    page.stub(:pipe_name_of_txt_if_empty_content).and_return :no_content
+    page.should_receive(:pipe_name_of_txt_if_empty_content).twice.and_return :no_content
     Pipe.should_receive(:new).and_return { pipe }
     pipe.should_receive(:get).with(:txt, txt: :no_content).and_return "No content."
     expect(page.html).to eq "No content."

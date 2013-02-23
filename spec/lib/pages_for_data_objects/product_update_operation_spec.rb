@@ -8,14 +8,14 @@ describe "ProductUpdateOperation" do
   end
 
   def load_from_params_prepare_fakes
-    product.stub(:load_from_params).with attribute_group: :for_update
+    product.should_receive(:load_from_params).with attribute_group: :for_update
     product.should_receive(:type).and_return :paintings
-    product_specifications.stub(:load_from_params).with attribute_group: :for_update, type: :paintings
+    product_specifications.should_receive(:load_from_params).with attribute_group: :for_update, type: :paintings
   end
 
   def accomplish_prepare_fakes
-    product.should_receive(:update).with(no_args()).and_return true
-    product_specifications.should_receive(:update).with(no_args()).and_return true
+    product.should_receive(:update).with(no_args).and_return true
+    product_specifications.should_receive(:update).with(no_args).and_return true
   end
 
   before do

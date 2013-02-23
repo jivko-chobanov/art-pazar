@@ -7,7 +7,9 @@ class UserDeleteOperation < Operation
   end
 
   def load(id)
-    super()
+    super() do
+      @user.set id: id
+    end
   end
 
   def accomplish(id)

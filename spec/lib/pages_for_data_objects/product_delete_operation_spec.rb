@@ -2,7 +2,7 @@ describe "ProductDeleteOperation" do
   let(:product) { double }
   let(:product_specifications) { double }
   let(:pipe) { double }
-  subject(:product_delete_page) do
+  subject(:product_delete_operation) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     ProductDeleteOperation.new
   end
@@ -22,23 +22,30 @@ describe "ProductDeleteOperation" do
     Main::Products.stub(:new).and_return product
     Main::ProductSpecifications.stub(:new).and_return product_specifications
     Pipe.stub(:new) { pipe }
-    Operation.send(:define_method, :load) { |&block| block.call if block_given? }
+    Operation.send(:define_method, :load) { |&block| block.call }
     Operation.send(:define_method, :accomplish) { |&block| block.call }
   end
 
   it "gets pipe" do
-    expect(product_delete_page.pipe).to eq pipe
+    expect(product_delete_operation.pipe).to eq pipe
   end
 
   context "deletes product and its specification" do
     it "with accomplish" do
+      product.should_receive(:set).with(id: 12)
+      product_specifications.should_receive(:set).with(product_id: 12)
+      product_delete_operation.load 12
+
       accomplish_prepare_fakes
-      expect(product_delete_page.accomplish 12).to be_true
+      expect(product_delete_operation.accomplish 12).to be_true
     end
 
     it "with load_and_accomplish" do
+      product.should_receive(:set).with(id: 12)
+      product_specifications.should_receive(:set).with(product_id: 12)
+
       accomplish_prepare_fakes
-      expect(product_delete_page.load_and_accomplish id: 12).to be_true
+      expect(product_delete_operation.load_and_accomplish id: 12).to be_true
     end
   end
 end

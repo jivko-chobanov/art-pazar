@@ -1,6 +1,6 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
-describe "In integration" do
+describe "In integration CartController" do
   let(:cart_controller) { CartController.new }
 
   context "when creating" do
@@ -24,11 +24,13 @@ describe "In integration" do
   it "quantity of a product can be changed" do
     expect(cart_controller.update_quantity id: 24, quantity: 2).to be_true
     expect { cart_controller.update_quantity id: 13, quantity: 2 }.to raise_error RuntimeError
+    pending
   end
 
   it "products can be removed from cart" do
     cart_controller.remove id: 24
     expect(cart_controller.products_count).to eq 0
+    pending
   end
 
   xit "is deleted when the last product is deleted" do

@@ -79,7 +79,7 @@ describe "Main::ProductSpecifications" do
 
     it "if product_id then first adds it to loaded data" do
       product_specifications.instance_variable_set :@runtime_table, runtime_table
-      runtime_table.should_receive(:row).with(no_args()).and_return row
+      runtime_table.should_receive(:row).with(no_args).and_return row
       row.should_receive(:<<).with product_id: 12
       expect(product_specifications.create 12).to eq "true from super with args: "
     end

@@ -1,7 +1,7 @@
 describe "UserDeleteOperation" do
   let(:user) { double }
   let(:pipe) { double }
-  subject(:user_delete_page) do
+  subject(:user_delete_operation) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     UserDeleteOperation.new
   end
@@ -18,23 +18,27 @@ describe "UserDeleteOperation" do
 
     Main::Users.stub(:new).and_return user
     Pipe.stub(:new) { pipe }
-    Operation.send(:define_method, :load) { |&block| block.call if block_given? }
+    Operation.send(:define_method, :load) { |&block| block.call }
     Operation.send(:define_method, :accomplish) { |&block| block.call }
   end
 
   it "gets pipe" do
-    expect(user_delete_page.pipe).to eq pipe
+    expect(user_delete_operation.pipe).to eq pipe
   end
 
   context "deletes user" do
     it "with accomplish" do
+      user.should_receive(:set).with(id: 12)
+      user_delete_operation.load 12
+
       accomplish_prepare_fakes
-      expect(user_delete_page.accomplish 12).to be_true
+      expect(user_delete_operation.accomplish 12).to be_true
     end
 
     it "with load_and_accomplish" do
+      user.should_receive(:set).with(id: 12)
       accomplish_prepare_fakes
-      expect(user_delete_page.load_and_accomplish id: 12).to be_true
+      expect(user_delete_operation.load_and_accomplish id: 12).to be_true
     end
   end
 end

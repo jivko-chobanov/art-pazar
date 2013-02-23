@@ -6,12 +6,12 @@ describe "CartListPage" do
   end
 
   def load_prepare_fakes
-    carts.stub(:load_from_db)
+    carts.should_receive(:load_from_db)
       .with attribute_group: :list_for_admin, order: :last, limit: 10
   end
 
   def html_prepare_fakes
-    carts.stub(:html).and_return "HTML for list of last 10 carts"
+    carts.should_receive(:html).and_return "HTML for list of last 10 carts"
   end
 
   before do
@@ -36,10 +36,10 @@ describe "CartListPage" do
     load_prepare_fakes
     cart_list_page.load
 
-    carts.stub(:loaded_empty_result?).with(no_args).and_return true
+    carts.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(cart_list_page.pipe_name_of_txt_if_empty_content).to eq :no_carts
 
-    carts.stub(:html).and_return "No carts."
+    carts.should_receive(:html).and_return "No carts."
     expect(cart_list_page.html).to eq "No carts."
   end
 end

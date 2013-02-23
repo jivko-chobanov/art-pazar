@@ -28,9 +28,11 @@ describe "AttributeGroups" do
     expect { attribute_groups.put :list, [:other, :price] }.to raise_error
 
     expect(attribute_groups.attributes_of :list).to eq [:name, :price]
-    Support.should_receive(:add_suffix).with([:name, :price], "_ok").and_return [:name_ok, :price_ok]
-    expect(attribute_groups.attributes_of :list, suffix_to_be_added: "_ok").to eq [:name_ok, :price_ok]
-    expect { attribute_groups.attributes_of :qqq }.to raise_error
+    Support.should_receive(:add_suffix).with([:name, :price], "_ok")
+      .and_return [:name_ok, :price_ok]
+    expect(attribute_groups.attributes_of :list, suffix_to_be_added: "_ok")
+      .to eq [:name_ok, :price_ok]
+    expect { attribute_groups.attributes_of :qqq }.to raise_error RuntimeError
 
     attribute_groups.put :other, [:id, :category]
     expect(attribute_groups.attributes_of :other).to eq [:id, :category]
@@ -45,5 +47,6 @@ describe "AttributeGroups" do
 
     expect(attribute_group.name).to be :list
     expect(attribute_group.attributes).to eq [:name, :price]
+    pending "useless functionality"
   end
 end

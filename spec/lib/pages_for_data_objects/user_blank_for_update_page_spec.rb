@@ -7,13 +7,13 @@ describe "UserBlankForUpdatePage" do
   end
 
   def load_from_db_prepare_fakes(id)
-    user.stub(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
+    user.should_receive(:load_from_db).with id: id, attribute_group: :for_update, limit: 1
   end
 
   def html_prepare_fakes
-    user.stub(:loaded_to_hashes).and_return ["data1"]
-    user.stub(:data_obj_name).and_return "Users"
-    pipe.stub(:get).with(:html_for_update, data_by_type: {
+    user.should_receive(:loaded_to_hashes).and_return ["data1"]
+    user.should_receive(:data_obj_name).and_return "Users"
+    pipe.should_receive(:get).with(:html_for_update, data_by_type: {
       "Users" => ["data1"],
     }).and_return "HTML for update user page"
   end
@@ -39,7 +39,7 @@ describe "UserBlankForUpdatePage" do
       load_from_db_prepare_fakes 12
       user_blank_for_update_page.load 12
 
-      user.stub(:loaded_empty_result?).with(no_args).and_return false
+      user.should_receive(:loaded_empty_result?).with(no_args).and_return false
       expect(user_blank_for_update_page.pipe_name_of_txt_if_empty_content).to eq false
 
       html_prepare_fakes
@@ -57,10 +57,10 @@ describe "UserBlankForUpdatePage" do
     load_from_db_prepare_fakes 12
     user_blank_for_update_page.load 12
 
-    user.stub(:loaded_empty_result?).with(no_args).and_return true
+    user.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(user_blank_for_update_page.pipe_name_of_txt_if_empty_content).to eq :no_user
 
-    user_blank_for_update_page.stub(:html).and_return "No user."
+    user_blank_for_update_page.should_receive(:html).and_return "No user."
     expect(user_blank_for_update_page.html).to eq "No user."
   end
 end

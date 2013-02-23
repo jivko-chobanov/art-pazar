@@ -7,13 +7,13 @@ describe "CartDetailsPage" do
   end
 
   def load_prepare_fakes(id)
-    cart.stub(:load_from_db).with id: id, attribute_group: :details, limit: 1
+    cart.should_receive(:load_from_db).with id: id, attribute_group: :details, limit: 1
   end
 
   def html_prepare_fakes
-    cart.stub(:loaded_to_hashes).and_return ["data1"]
-    cart.stub(:data_obj_name).and_return "Carts"
-    pipe.stub(:get).with(:html, data_by_type: {
+    cart.should_receive(:loaded_to_hashes).and_return ["data1"]
+    cart.should_receive(:data_obj_name).and_return "Carts"
+    pipe.should_receive(:get).with(:html, data_by_type: {
       "Carts" => ["data1"],
     }).and_return "HTML for cart page"
   end
@@ -50,10 +50,10 @@ describe "CartDetailsPage" do
     load_prepare_fakes 14
     cart_details_page.load 14
 
-    cart.stub(:loaded_empty_result?).with(no_args).and_return true
+    cart.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(cart_details_page.pipe_name_of_txt_if_empty_content).to eq :no_cart
 
-    cart_details_page.stub(:html).and_return "No cart."
+    cart_details_page.should_receive(:html).and_return "No cart."
     expect(cart_details_page.html).to eq "No cart."
   end
 end

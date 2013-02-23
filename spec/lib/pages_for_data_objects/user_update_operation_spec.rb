@@ -7,11 +7,11 @@ describe "UserUpdateOperation" do
   end
 
   def load_from_params_prepare_fakes
-    user.stub(:load_from_params).with attribute_group: :for_update
+    user.should_receive(:load_from_params).with attribute_group: :for_update
   end
 
   def accomplish_prepare_fakes
-    user.should_receive(:update).with(no_args()).and_return true
+    user.should_receive(:update).with(no_args).and_return true
   end
 
   before do

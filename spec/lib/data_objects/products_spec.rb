@@ -33,7 +33,7 @@ describe "Main::Products" do
 
         runtime_table.should_receive(:row).at_least(:once).and_return row
         row.should_receive(:respond_to?).at_least(:once).with(:id).and_return true
-        row.should_receive(:id).at_least(:once).with(no_args()).and_return 12
+        row.should_receive(:id).at_least(:once).with(no_args).and_return 12
         expect(products.id).to eq 12
       end
     end

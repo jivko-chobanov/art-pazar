@@ -10,9 +10,9 @@ describe "CartBlankForCreatePage" do
   end
 
   def html_prepare_fakes
-    cart.stub(:attributes_of).and_return ["attribute names 1"]
-    cart.stub(:data_obj_name).and_return "Carts"
-    pipe.stub(:get).with(:html_for_create, data_by_type: {
+    cart.should_receive(:attributes_of).and_return ["attribute names 1"]
+    cart.should_receive(:data_obj_name).and_return "Carts"
+    pipe.should_receive(:get).with(:html_for_create, data_by_type: {
       "Carts" => ["attribute names 1"],
     }).and_return "HTML for create cart page"
   end

@@ -1,12 +1,16 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
-describe "In integration" do
+describe "In integration RequestController works with Carts" do
   let(:controller) { RequestController.new }
+
+  def prepare_user_of_type_and_id_of_item(type, id_from_params = 14, id = 14)
+    Pipe::Fake.should_receive(:get_from_session).and_return id: id, type: type
+    Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return id_from_params
+  end
 
   context "registered" do
     it "gets cart page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :registered
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 83
+      prepare_user_of_type_and_id_of_item :registered, 83 
       expect(controller.action :details, :cart).to eq(
 "HTML for Carts
 
@@ -17,8 +21,7 @@ ID  BUYER_ID  SELLER_ID
     end
 
     it "gets cart create page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item :seller, false 
       expect(controller.action :blank_for_create, :cart).to eq(
 "HTML for creating Carts with fields:
 
@@ -28,8 +31,7 @@ buyer_id, seller_id
     end
 
     it "creates cart" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item :seller, false 
       expect(controller.action :create, :cart).to eq true
       expect(controller.logs).to eq(
         ["Got params: buyer_id_C = buyer_id_C param val, " <<
@@ -40,8 +42,7 @@ buyer_id, seller_id
     end
 
     it "gets cart update page html" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 16 
       expect(controller.action :blank_for_update, :cart).to eq(
 %q{HTML for updating Carts fields:
 
@@ -51,8 +52,7 @@ id was "0", buyer_id was "0", seller_id was "0"
     end
 
     it "updates cart" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 14, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 16 
       expect(controller.action :update, :cart).to eq true
       expect(controller.logs).to eq(
         ["Got params: id_C = id_C param val, buyer_id_C = buyer_id_C param val, " <<
@@ -63,11 +63,10 @@ id was "0", buyer_id was "0", seller_id was "0"
     end
 
     it "deletes cart" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 16, type: :seller
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return 16
+      prepare_user_of_type_and_id_of_item :seller, 19 
       expect(controller.action :delete, :cart).to eq true
       expect(controller.logs).to eq(
-        ["Carts with id = 16 is now deleted."]
+        ["Carts with id = 19 is now deleted."]
       )
     end
   end
@@ -77,8 +76,7 @@ id was "0", buyer_id was "0", seller_id was "0"
 
   context "admin" do
     it "sees html for carts" do
-      Pipe::Fake.should_receive(:get_from_session).and_return id: 16, type: :admin
-      Pipe::Fake.should_receive(:param_if_exists).with(:id).and_return false
+      prepare_user_of_type_and_id_of_item :admin, false 
       expect(controller.action :list, :cart).to eq "HTML for Carts
 
 Carts:

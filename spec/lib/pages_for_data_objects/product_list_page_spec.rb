@@ -6,12 +6,12 @@ describe "ProductListPage" do
   end
 
   def load_prepare_fakes
-    products.stub(:load_from_db)
+    products.should_receive(:load_from_db)
       .with attribute_group: :list, order: :last, limit: 10
   end
 
   def html_prepare_fakes
-    products.stub(:html).and_return "HTML for list of last 10 products"
+    products.should_receive(:html).and_return "HTML for list of last 10 products"
   end
 
   before do
@@ -36,10 +36,10 @@ describe "ProductListPage" do
     load_prepare_fakes
     product_list_page.load
 
-    products.stub(:loaded_empty_result?).with(no_args).and_return true
+    products.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(product_list_page.pipe_name_of_txt_if_empty_content).to eq :no_products
 
-    products.stub(:html).and_return "No products."
+    products.should_receive(:html).and_return "No products."
     expect(product_list_page.html).to eq "No products."
   end
 end

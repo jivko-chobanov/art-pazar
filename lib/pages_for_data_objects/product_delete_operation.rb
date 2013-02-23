@@ -8,7 +8,10 @@ class ProductDeleteOperation < Operation
   end
 
   def load(id)
-    super()
+    super() do
+      @product.set id: id
+      @product_specifications.set product_id: id
+    end
   end
 
   def accomplish(id)

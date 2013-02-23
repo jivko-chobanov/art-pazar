@@ -6,12 +6,12 @@ describe "UserListPage" do
   end
 
   def load_prepare_fakes
-    users.stub(:load_from_db)
+    users.should_receive(:load_from_db)
       .with attribute_group: :list_for_admin, order: :last, limit: 10
   end
 
   def html_prepare_fakes
-    users.stub(:html).and_return "HTML for list of last 10 users"
+    users.should_receive(:html).and_return "HTML for list of last 10 users"
   end
 
   before do
@@ -36,10 +36,10 @@ describe "UserListPage" do
     load_prepare_fakes
     user_list_page.load
 
-    users.stub(:loaded_empty_result?).with(no_args).and_return true
+    users.should_receive(:loaded_empty_result?).with(no_args).and_return true
     expect(user_list_page.pipe_name_of_txt_if_empty_content).to eq :no_users
 
-    users.stub(:html).and_return "No users."
+    users.should_receive(:html).and_return "No users."
     expect(user_list_page.html).to eq "No users."
   end
 end

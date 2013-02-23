@@ -11,7 +11,7 @@ describe "CartCreateOperation" do
   end
 
   def accomplish_prepare_fakes
-    cart.should_receive(:create).with(no_args()).and_return true
+    cart.should_receive(:create).with(no_args).and_return true
   end
 
   before do

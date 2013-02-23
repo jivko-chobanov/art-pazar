@@ -1,7 +1,7 @@
 describe "CartDeleteOperation" do
   let(:cart) { double }
   let(:pipe) { double }
-  subject(:cart_delete_page) do
+  subject(:cart_delete_operation) do
     require __FILE__.sub("/spec/", "/").sub("_spec.rb", ".rb")
     CartDeleteOperation.new
   end
@@ -18,23 +18,27 @@ describe "CartDeleteOperation" do
 
     Main::Carts.stub(:new).and_return cart
     Pipe.stub(:new) { pipe }
-    Operation.send(:define_method, :load) { |&block| block.call if block_given? }
+    Operation.send(:define_method, :load) { |&block| block.call }
     Operation.send(:define_method, :accomplish) { |&block| block.call }
   end
 
   it "gets pipe" do
-    expect(cart_delete_page.pipe).to eq pipe
+    expect(cart_delete_operation.pipe).to eq pipe
   end
 
   context "deletes cart" do
-    it "with accomplish" do
+    it "with load from args and accomplish" do
+      cart.should_receive(:set).with(id: 12)
+      cart_delete_operation.load 12
+
       accomplish_prepare_fakes
-      expect(cart_delete_page.accomplish 12).to be_true
+      expect(cart_delete_operation.accomplish 12).to be_true
     end
 
     it "with load_and_accomplish" do
+      cart.should_receive(:set).with(id: 12)
       accomplish_prepare_fakes
-      expect(cart_delete_page.load_and_accomplish id: 12).to be_true
+      expect(cart_delete_operation.load_and_accomplish id: 12).to be_true
     end
   end
 end

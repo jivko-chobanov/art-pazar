@@ -7,7 +7,9 @@ class CartDeleteOperation < Operation
   end
 
   def load(id)
-    super()
+    super() do
+      @cart.set id: id
+    end
   end
 
   def accomplish(id)

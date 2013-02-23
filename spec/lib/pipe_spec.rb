@@ -26,15 +26,20 @@ describe "Pipe" do
     Support.stub(:must_be_hash).and_return true
   end
 
-  context "when undefined command" do
-    it "raises exceptions" do
+  context "raises exceptions" do
+    it "when no data object name" do
       expect { pipe.get :runtime_table_hashes, qqqq: 4 }.to raise_error RuntimeError
-      expect { pipe.get :runtime_table_hashes, data_obj_name: "Products" }
-        .to raise_error Pipe::MissingNeedOrInputError
+      expect { pipe.get :html, qqq: 4 }.to raise_error RuntimeError
+    end
+
+    it "when no limit" do
+    expect { pipe.get :runtime_table_hashes, data_obj_name: "Products" }
+      .to raise_error RuntimeError
+    end
+
+    it "when unknown fake data for such data object name" do
       expect { pipe.get :runtime_table_hashes, data_obj_name: "Qqq" }
         .to raise_error RuntimeError
-      expect { pipe.get :html, qqq: 4 }
-        .to raise_error Pipe::MissingNeedOrInputError
     end
   end
 
@@ -108,9 +113,9 @@ describe "Pipe" do
     context "when fake html is wanted" do
       context "when data is ok" do
         it "generates data object visualization" do
-          Support.stub(:as_table_string)
+          Support.should_receive(:as_table_string)
             .with("product items for #as_table_string") { "products table string\n" }
-          Support.stub(:as_table_string)
+          Support.should_receive(:as_table_string)
             .with("qqq items for #as_table_string") { "qqq table string\n" }
 
           html = pipe.get :html, {

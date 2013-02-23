@@ -1,6 +1,6 @@
 require(__FILE__.split('art_pazar/').first << '/art_pazar/lib/lib_loader.rb')
 
-describe "In integration" do
+describe "In integration RequestController works with Users" do
   let(:controller) { RequestController.new }
 
   def user_of_type(type, id = 14, id_from_params = 14)
@@ -19,11 +19,9 @@ NAME            SURNAME            TYPE
 name value (0)  surname value (0)  type value (0)
 ")
     end
-  end
 
-  context "seller" do
     it "gets profile create page html" do
-      user_of_type :seller
+      user_of_type :registered
       expect(controller.action :blank_for_create, :user).to eq(
 "HTML for creating Users with fields:
 
@@ -33,7 +31,7 @@ name, surname, username, password
     end
 
     it "creates profile" do
-      user_of_type :seller
+      user_of_type :registered
       expect(controller.action :create, :user).to eq true
       expect(controller.logs).to eq(
         ["Got params: name_U = name_U param val, surname_U = surname_U param val, " <<
@@ -44,7 +42,7 @@ name, surname, username, password
     end
 
     it "gets profile update page html" do
-      user_of_type :seller
+      user_of_type :registered
       expect(controller.action :blank_for_update, :user).to eq(
 %q{HTML for updating Users fields:
 
@@ -54,7 +52,7 @@ id was "0", name was "name value (0)", surname was "surname value (0)"
     end
 
     it "updates profile" do
-      user_of_type :seller
+      user_of_type :registered
       expect(controller.action :update, :user).to eq true
       expect(controller.logs).to eq(
         ["Got params: id_U = id_U param val, name_U = name_U param val, " <<
@@ -65,12 +63,15 @@ id was "0", name was "name value (0)", surname was "surname value (0)"
     end
 
     it "deletes profile" do
-      user_of_type :seller
+      user_of_type :registered
       expect(controller.action :delete, :user).to eq true
       expect(controller.logs).to eq(
         ["Users with id = 14 is now deleted."]
       )
     end
+  end
+
+  context "seller" do
   end
 
   context "admin" do

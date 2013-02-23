@@ -11,7 +11,7 @@ describe "UserCreateOperation" do
   end
 
   def accomplish_prepare_fakes
-    user.should_receive(:create).with(no_args()).and_return true
+    user.should_receive(:create).with(no_args).and_return true
   end
 
   before do
